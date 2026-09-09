@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jay Repair Information Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans antialiased min-h-screen flex flex-col" x-data="app()" x-init="initApp()">
+
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3 cursor-pointer" @click="setPage('home')">
+        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 012 2v1eM8 8h8m-8 4h8m-8 4h5M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"></path>
+        </svg>
+        <span class="text-xl font-bold tracking-wide">Jay Repair <span class="text-blue-400">Info Center</span></span>
+      </div>
+      
+      <nav class="flex flex-wrap justify-center items-center gap-2">
+        <button @click="setPage('home')" :class="activePage === 'home' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-slate-800'" class="px-3 py-2 rounded-md text-sm font-medium transition">Home</button>
+        <button @click="setPage('symptoms')" :class="activePage === 'symptoms' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-slate-800'" class="px-3 py-2 rounded-md text-sm font-medium transition">All Symptoms</button>
+        <button @click="setPage('videos')" :class="activePage === 'videos' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-slate-800'" class="px-3 py-2 rounded-md text-sm font-medium transition">Video Tutorials</button>
+        <button @click="setPage('contact')" :class="activePage === 'contact' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-slate-800'" class="px-3 py-2 rounded-md text-sm font-medium transition">Contact Support</button>
+        <a href="https://jay-repair-shop.onrender.com" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-md text-sm font-medium transition flex items-center gap-1">
+          <span>Book Repair</span>
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="bg-slate-800 text-white py-10 px-4 text-center">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-3xl md:text-4xl font-extrabold mb-3" x-text="pageTitles[activePage].title"></h1>
+      <p class="text-slate-300 text-sm md:text-base mb-6" x-text="pageTitles[activePage].subtitle"></p>
+      
+      <div class="relative max-w-xl mx-auto" x-show="['home', 'symptoms', 'videos'].includes(activePage)">
+        <input 
+          type="text" 
+          x-model="searchQuery" 
+          placeholder="Search symptoms or video guides..." 
+          class="w-full py-3 pl-4 pr-10 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow text-sm"
+        >
+      </div>
+    </div>
+  </section>
+
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow space-y-8">
+
+    <div x-show="['symptoms', 'home'].includes(activePage)" x-cloak class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded shadow-sm text-amber-900 text-sm">
+      <div class="flex items-start space-x-3">
+        <svg class="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        <div>
+          <strong class="font-bold">Hardware Safety Information:</strong> If your device has suffered liquid damage, shows a swollen casing/battery, or emits burning smells, disconnect power immediately and do not attempt to turn it on.
+        </div>
+      </div>
+    </div>
+
+    <!-- Home Overview -->
+    <div x-show="activePage === 'home'" x-cloak class="space-y-8">
+      <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 text-center py-12">
+        <h2 class="text-3xl font-bold text-slate-900 mb-4">Welcome to Jay Repair Information Center</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto mb-6 text-sm md:text-base">
+          Diagnose hardware issues across PC Desktops, Laptops, and Mobile Devices or watch video repair guides.
+        </p>
+        <div class="flex justify-center gap-4 flex-wrap">
+          <button @click="setPage('symptoms')" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+            View All Hardware Symptoms
+          </button>
+          <button @click="setPage('videos')" class="bg-slate-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-slate-900 transition">
+            Watch Video Tutorials
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Combined Symptoms Page -->
+    <div x-show="activePage === 'symptoms'" x-cloak class="space-y-12">
+      <div class="flex justify-center gap-2 border-b pb-4">
+        <button @click="deviceFilter = 'all'" :class="deviceFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'" class="px-4 py-2 rounded-md text-sm font-semibold border transition">All Devices</button>
+        <button @click="deviceFilter = 'computer'" :class="deviceFilter === 'computer' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'" class="px-4 py-2 rounded-md text-sm font-semibold border transition">Desktop PC</button>
+        <button @click="deviceFilter = 'laptop'" :class="deviceFilter === 'laptop' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'" class="px-4 py-2 rounded-md text-sm font-semibold border transition">Laptop</button>
+        <button @click="deviceFilter = 'phone'" :class="deviceFilter === 'phone' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'" class="px-4 py-2 rounded-md text-sm font-semibold border transition">Cell Phone</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <template x-for="item in combinedSymptoms" :key="item.id">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex flex-col justify-between" x-show="deviceFilter === 'all' || deviceFilter === item.deviceType">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700" x-text="item.deviceLabel"></span>
+                <span class="text-xs px-2.5 py-1 rounded font-semibold" :class="getSeverityClass(item.severity)" x-text="item.severity"></span>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900 mb-2" x-text="item.title"></h3>
+              <p class="text-sm text-gray-600 mb-4"><strong>Symptom:</strong> <span x-text="item.symptom"></span></p>
+              <div class="bg-slate-50 p-3 rounded border border-slate-200 text-xs space-y-1 mb-4">
+                <p class="font-semibold text-slate-700">Key Troubleshooting Indicators & Actions:</p>
+                <ul class="list-disc list-inside text-gray-600 space-y-1">
+                  <template x-for="action in item.actions">
+                    <li x-text="action"></li>
+                  </template>
+                </ul>
+              </div>
+            </div>
+            <button @click="setPage('contact')" class="w-full bg-slate-900 text-white text-xs py-2 px-3 rounded font-semibold hover:bg-blue-600 transition text-center">
+              Ask Support About This Symptom &rarr;
+            </button>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Video Tutorials Page -->
+    <div x-show="activePage === 'videos'" x-cloak class="space-y-6">
+      <!-- Video Category Filter -->
+      <div class="flex justify-center gap-2 border-b pb-4">
+        <button @click="videoCategoryFilter = 'all'" :class="videoCategoryFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'" class="px-4 py-2 rounded-md text-sm font-semibold border transition">All Videos</button>
+        <button @click="videoCategoryFilter = 'Desktop PC'" :class="videoCategoryFilter === 'Desktop PC' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'" class="px-4 py-2 rounded-md text-sm font-semibold border transition">Desktop PC</button>
+        <button @click="videoCategoryFilter = 'Laptop'" :class="videoCategoryFilter === 'Laptop' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'" class="px-4 py-2 rounded-md text-sm font-semibold border transition">Laptop</button>
+        <button @click="videoCategoryFilter = 'Cell Phone'" :class="videoCategoryFilter === 'Cell Phone' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'" class="px-4 py-2 rounded-md text-sm font-semibold border transition">Cell Phone</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <template x-for="video in filteredVideos" :key="video.id">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="relative bg-slate-900 aspect-video flex items-center justify-center text-white">
+                <iframe :src="video.embedUrl" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen x-show="video.embedUrl"></iframe>
+                <div x-show="!video.embedUrl" class="text-center p-4">
+                  <svg class="w-12 h-12 text-slate-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <p class="text-xs text-slate-400" x-text="video.title"></p>
+                </div>
+              </div>
+              <div class="p-4">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider" x-text="video.category"></span>
+                  <span class="text-xs text-gray-400 font-mono" x-text="video.duration"></span>
+                </div>
+                <h3 class="text-base font-bold text-gray-900 mb-2" x-text="video.title"></h3>
+                <p class="text-xs text-gray-600 line-clamp-3" x-text="video.description"></p>
+              </div>
+            </div>
+            <div class="p-4 pt-0">
+              <a :href="video.url" target="_blank" rel="noopener noreferrer" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded transition">
+                Watch on YouTube &rarr;
+              </a>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Contact Page -->
+    <div x-show="activePage === 'contact'" x-cloak class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow border border-gray-200">
+      <h2 class="text-2xl font-bold mb-2 text-slate-800">Contact Technical Support</h2>
+      <p class="text-gray-600 text-sm mb-8">Reach out to our engineering team directly or inspect our organization profile below.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="flex flex-col items-center justify-center bg-slate-50 p-6 rounded-lg border border-slate-200 shadow-sm text-center">
+          <div class="w-28 h-28 mb-4 rounded-full overflow-hidden border-2 border-blue-500 shadow-sm bg-slate-200 flex items-center justify-center">
+            <img src="./founder.jpeg" alt="Lead Developer" class="w-full h-full object-cover object-top">
+          </div>
+          <h3 class="text-base font-bold text-slate-900 mb-1">Lead Developer</h3>
+          <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">Jay Repair Engineer</span>
+        </div>
+
+        <div class="flex flex-col items-center justify-center bg-slate-50 p-6 rounded-lg border border-slate-200 shadow-sm text-center">
+          <div class="w-28 h-28 mb-4 rounded-full overflow-hidden border-2 border-blue-500 shadow-sm bg-white flex items-center justify-center p-2">
+            <img src="./logo.png" alt="Company Logo" class="w-full h-full object-contain">
+          </div>
+          <h3 class="text-base font-bold text-slate-900 mb-1">Company Brand</h3>
+          <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">Jay Repair Services</span>
+        </div>
+
+        <div class="flex flex-col items-center justify-center bg-slate-50 p-6 rounded-lg border border-slate-200 shadow-sm text-center">
+          <div class="w-28 h-28 mb-4 rounded-full overflow-hidden border-2 border-blue-500 shadow-sm bg-slate-200 flex items-center justify-center">
+            <img src="./team.jpeg" alt="Company Team" class="w-full h-full object-cover object-center">
+          </div>
+          <h3 class="text-base font-bold text-slate-900 mb-1">Company Team</h3>
+          <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">Support Specialists</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 border-b pb-2">Direct Channel Directories</h4>
+        <div class="flex flex-col space-y-3 text-sm">
+          <div class="flex items-center space-x-3 text-slate-700">
+            <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            <a href="mailto:jayrepair2026@gmail.com" class="hover:underline font-medium text-blue-600">jayrepair2026@gmail.com</a>
+          </div>
+          <div class="flex items-center space-x-3 text-slate-700">
+            <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 002 2h1.5a1 1 0 00.95-.69l1.2-3.6a1 1 0 00-.24-1.07l-1.8-1.8a16 16 0 007.8 7.8l1.8-1.8a1 1 0 011.07-.24l3.6 1.2a1 1 0 01.69.95V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+            <a href="tel:0626218943" class="hover:underline font-medium">0626218943</a>
+          </div>
+          <div class="flex items-center space-x-3 text-slate-700">
+            <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <a href="https://www.facebook.com/share/1BYppYCtD9/" target="_blank" rel="noopener noreferrer" class="hover:underline font-medium text-blue-600">Facebook Page</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-center text-sm">
+      <p>&copy; 2026 Jay Repair Information Center. Educational and informational hardware guide.</p>
+      <p>Need a repair service? <a href="https://jay-repair-shop.onrender.com" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">Book a Repair Here &rarr;</a></p>
+    </div>
+  </footer>
+
+  <script>
+    function app() {
+      return {
+        activePage: 'home',
+        searchQuery: '',
+        deviceFilter: 'all',
+        videoCategoryFilter: 'all',
+
+        pageTitles: {
+          home: { title: 'Hardware Diagnostic Information Center', subtitle: 'Explore technical causes, repair guides, and video tutorials.' },
+          symptoms: { title: 'Hardware Diagnostics & Symptoms', subtitle: 'Unified guide for Desktop PC, Laptop, and Cell Phone hardware issues.' },
+          videos: { title: 'Video Tutorials & Repair Guides', subtitle: 'Step-by-step visual guides for hardware troubleshooting and teardowns.' },
+          contact: { title: 'Contact Support', subtitle: 'Ask a technical question about your device symptoms.' }
+        },
+
+        videos: [
+          {
+            id: 'v1',
+            title: 'How to Fix No Power / No Boot PC Issues',
+            category: 'Desktop PC',
+            duration: '12:45',
+            description: 'Step-by-step diagnostic guide to troubleshoot dead power supplies, motherboard short circuits, and RAM reseating.',
+            url: 'https://www.youtube.com/watch?v=fV7_yG_4T0M',
+            embedUrl: 'https://www.youtube.com/embed/fV7_yG_4T0M'
+          },
+          {
+            id: 'v2',
+            title: 'Laptop Thermal Paste Replacement & Cooling Clean',
+            category: 'Laptop',
+            duration: '15:20',
+            description: 'Learn how to disassemble your laptop, remove dust from fan vents, and reapply thermal paste to fix thermal throttling.',
+            url: 'https://www.youtube.com/watch?v=33K1d8d3RRE',
+            embedUrl: 'https://www.youtube.com/embed/33K1d8d3RRE'
+          },
+          {
+            id: 'v3',
+            title: 'Smartphone Screen & Battery Replacement Guide',
+            category: 'Cell Phone',
+            duration: '18:10',
+            description: 'General breakdown on safely opening a phone casing, disconnecting battery flex cables, and replacing digitizers.',
+            url: 'https://www.youtube.com/watch?v=pY5a1iE9eXg',
+            embedUrl: 'https://www.youtube.com/embed/pY5a1iE9eXg'
+          },
+          {
+            id: 'v4',
+            title: 'How to Test PC Power Supply (PSU) with a Multimeter',
+            category: 'Desktop PC',
+            duration: '08:30',
+            description: 'Verify 12V, 5V, and 3.3V power rails using a digital multimeter or standard paperclip test safely.',
+            url: 'https://www.youtube.com/watch?v=ac7YMUcB510',
+            embedUrl: 'https://www.youtube.com/embed/ac7YMUcB510'
+          },
+          {
+            id: 'v5',
+            title: 'Diagnosing Laptop Battery & DC Charging Port',
+            category: 'Laptop',
+            duration: '10:15',
+            description: 'Identify if a laptop power failure is caused by a broken DC jack pin, dead AC adapter brick, or motherboard charging IC.',
+            url: 'https://www.youtube.com/watch?v=F3_s8XG2N9c',
+            embedUrl: 'https://www.youtube.com/embed/F3_s8XG2N9c'
+          },
+          {
+            id: 'v6',
+            title: 'Cell Phone Water Damage Cleaning & Corrosion Repair',
+            category: 'Cell Phone',
+            duration: '14:05',
+            description: 'Emergency step-by-step procedure for removing liquid corrosion from smartphone motherboards using isopropyl alcohol.',
+            url: 'https://www.youtube.com/watch?v=Y85E1V8fGkg',
+            embedUrl: 'https://www.youtube.com/embed/Y85E1V8fGkg'
+          }
+        ],
+
+        symptomsData: {
+          computer: [
+            { 
+              id: 'c_power', 
+              deviceType: 'computer',
+              deviceLabel: 'Desktop PC',
+              title: 'Power & Boot Symptoms', 
+              symptom: 'No power response, short boot loops, PSU whining/popping, or BIOS date/time resetting.', 
+              severity: 'Emergency', 
+              actions: [
+                'System gives no response (no LEDs, no fan movement, no beep codes) when pressing power button',
+                'Desktop turns on for a few seconds and immediately shuts down or enters continuous restart loop',
+                'Power supply unit (PSU) produces loud popping sound, high-pitched electrical whine, or burning smell',
+                'PC turns on, but BIOS/UEFI resets date, time, and settings when main power is disconnected (dead CMOS battery)'
+              ] 
+            },
+            { 
+              id: 'c_graphics', 
+              deviceType: 'computer',
+              deviceLabel: 'Desktop PC',
+              title: 'Display & Graphics Symptoms', 
+              symptom: 'Monitor showing No Signal while fans spin, visual artifacts, display driver crashes, or GPU port output failure.', 
+              severity: 'High Priority', 
+              actions: [
+                'PC powers on (fans spinning, motherboard lights active), but monitor displays "No Signal"',
+                'Visual artifacts, random screen tearing, missing colors, or blocky patterns during gaming or desktop use',
+                'Display driver constantly crashes and recovers, or screen goes black under heavy graphics loads',
+                'No display output from dedicated GPU ports while integrated motherboard display works'
+              ] 
+            }
+          ],
+          laptop: [
+            { 
+              id: 'l_power', 
+              deviceType: 'laptop',
+              deviceLabel: 'Laptop',
+              title: 'Power & Battery Symptoms', 
+              symptom: 'No LED indicators on power button press, failure to charge, unexpected shut offs, or loose/overheating DC jack/USB-C ports.', 
+              severity: 'Emergency', 
+              actions: [
+                'Laptop does not turn on or show any status LEDs when power button is pressed',
+                'Battery fails to charge, drains rapidly, or shows "Plugged in, not charging"',
+                'Laptop suddenly shuts down or powers off when unplugged from AC adapter',
+                'Power adapter or charging port (DC jack/USB-C) feels excessively hot, loose, or requires wiggling'
+              ] 
+            },
+            { 
+              id: 'l_display', 
+              deviceType: 'laptop',
+              deviceLabel: 'Laptop',
+              title: 'Display & Video Symptoms', 
+              symptom: 'Black screen with active fans, screen flickering/lines, dim backlight inverter issues, cracked matrix, or resolution lock.', 
+              severity: 'High Priority', 
+              actions: [
+                'Screen remains completely black/blank while power LEDs and fans run',
+                'Screen flickers, displays vertical/horizontal colored lines, or shows GPU/cable artifacts',
+                'Dim or faint image visible only when shining a light directly on panel (backlight failure)'
+              ] 
+            }
+          ],
+          phone: [
+            { 
+              id: 'p_power', 
+              deviceType: 'phone',
+              deviceLabel: 'Cell Phone',
+              title: 'Power & Battery Issues', 
+              symptom: 'Fails to turn on, boot loops, erratic/rapid discharge, slow/intermittent charging, swollen frame, or extreme idle/charging heat.', 
+              severity: 'Emergency', 
+              actions: [
+                'Continuous boot looping or failure to turn on',
+                'Rapid battery drain or percentage jumping erratically',
+                'Slow, intermittent, or unregistered charging connection',
+                'Swollen battery lifting screen or back cover (Disconnect power immediately)'
+              ] 
+            },
+            { 
+              id: 'p_display', 
+              deviceType: 'phone',
+              deviceLabel: 'Cell Phone',
+              title: 'Display & Touch Controls', 
+              symptom: 'Cracked glass/digitizer, blank display with active sound, screen matrix lines/flickering, ghosting, or dead touch zones.', 
+              severity: 'High Priority', 
+              actions: [
+                'Cracked outer glass or shattered digitizer',
+                'Blank display (black screen) with active sound/vibrations',
+                'Matrix flicker, vertical/horizontal lines, or color discoloration'
+              ] 
+            }
+          ]
+        },
+
+        initApp() {
+          const hash = window.location.hash.replace('#', '');
+          if (['home', 'symptoms', 'videos', 'contact'].includes(hash)) {
+            this.activePage = hash;
+          }
+
+          window.addEventListener('hashchange', () => {
+            const currentHash = window.location.hash.replace('#', '');
+            if (['home', 'symptoms', 'videos', 'contact'].includes(currentHash)) {
+              this.activePage = currentHash;
+            }
+          });
+        },
+
+        setPage(page) {
+          this.activePage = page;
+          window.location.hash = page;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+
+        get combinedSymptoms() {
+          const all = [
+            ...this.symptomsData.computer,
+            ...this.symptomsData.laptop,
+            ...this.symptomsData.phone
+          ];
+          if (!this.searchQuery.trim()) return all;
+          const q = this.searchQuery.toLowerCase();
+          return all.filter(item => 
+            item.title.toLowerCase().includes(q) || 
+            item.symptom.toLowerCase().includes(q) ||
+            item.actions.some(a => a.toLowerCase().includes(q))
+          );
+        },
+
+        get filteredVideos() {
+          return this.videos.filter(v => {
+            const matchesCategory = this.videoCategoryFilter === 'all' || v.category === this.videoCategoryFilter;
+            if (!this.searchQuery.trim()) return matchesCategory;
+            const q = this.searchQuery.toLowerCase();
+            const matchesSearch = v.title.toLowerCase().includes(q) || 
+                                  v.description.toLowerCase().includes(q) ||
+                                  v.category.toLowerCase().includes(q);
+            return matchesCategory && matchesSearch;
+          });
+        },
+
+        getSeverityClass(severity) {
+          if (severity === 'Emergency' || severity === 'Critical Error') {
+            return 'bg-red-100 text-red-800';
+          }
+          if (severity === 'High Priority' || severity === 'Hardware Warning') {
+            return 'bg-amber-100 text-amber-800';
+          }
+          return 'bg-blue-100 text-blue-800';
+        }
+      }
+    }
+  </script>
+</body>
+</html>
