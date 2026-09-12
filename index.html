@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jay Repair Information Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    @media print {
+      body * { visibility: hidden; }
+      #printReport, #printReport * { visibility: visible; }
+      #printReport { position: absolute; left: 0; top: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col" x-data="app()" x-init="initApp()">
+
+  <!-- Sticky Header Navigation -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3 cursor-pointer" @click="setPage('home')">
+        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 012 2v1eM8 8h8m-8 4h8m-8 4h5M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"></path>
+        </svg>
+        <span class="text-xl font-bold tracking-wide">Jay Repair <span class="text-blue-400">Info Center</span></span>
+      </div>
+      
+      <nav class="flex flex-wrap justify-center items-center gap-1 md:gap-2">
+        <button @click="setPage('home')" :class="activePage === 'home' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'" class="px-3 py-1.5 rounded-md text-xs md:text-sm font-medium transition">Home</button>
+        <button @click="setPage('diagnose')" :class="activePage === 'diagnose' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'" class="px-3 py-1.5 rounded-md text-xs md:text-sm font-medium transition flex items-center gap-1">
+          <span>⚡ Diagnostics</span>
+        </button>
+        <button @click="setPage('pricing')" :class="activePage === 'pricing' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'" class="px-3 py-1.5 rounded-md text-xs md:text-sm font-medium transition flex items-center gap-1">
+          <span>🏷️ Pricing & Showcase</span>
+        </button>
+        <button @click="setPage('contact')" :class="activePage === 'contact' ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-800'" class="px-3 py-1.5 rounded-md text-xs md:text-sm font-medium transition">Contact Support</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-slate-800 text-white py-8 px-4 text-center border-b border-slate-700">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-2xl md:text-4xl font-extrabold mb-2" x-text="pageTitles[activePage].title"></h1>
+      <p class="text-slate-300 text-xs md:text-sm" x-text="pageTitles[activePage].subtitle"></p>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow space-y-8 w-full">
+
+    <!-- Global Emergency Safety Banner -->
+    <div x-show="['home', 'diagnose', 'pricing'].includes(activePage)" x-cloak class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r shadow-sm text-amber-900 text-sm">
+      <div class="flex items-start space-x-3">
+        <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        <div>
+          <strong class="font-bold">Hardware Safety Precaution:</strong> If your device was exposed to liquid, exhibits battery swelling, or produces electrical burning smells, disconnect all power immediately. Do not attempt to charge or power on the device.
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 1: Home Overview -->
+    <div x-show="activePage === 'home'" x-cloak class="space-y-8">
+      <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 text-center py-12">
+        <h2 class="text-3xl font-extrabold text-slate-900 mb-3">Jay Repair Technical Diagnostic Hub</h2>
+        <p class="text-slate-600 max-w-2xl mx-auto mb-8 text-sm md:text-base leading-relaxed">
+          Comprehensive hardware diagnostic suite for PC Desktops, Laptops, and Mobile Devices. Utilize our interactive troubleshooting wizard, review transparent list pricing, and inspect before & after repair transformations.
+        </p>
+        
+        <!-- Booking CTA Button for Home Page -->
+        <div class="mb-8">
+          <a href="https://jay-repair-shop.onrender.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-lg shadow-md transition text-base">
+            <span>Book Repair Online</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+          <button @click="setPage('diagnose')" class="p-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex flex-col items-center gap-2 shadow">
+            <span class="text-2xl">⚡</span>
+            <span class="text-sm">Diagnostic Wizard</span>
+          </button>
+          <button @click="setPage('pricing')" class="p-4 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition flex flex-col items-center gap-2 shadow">
+            <span class="text-2xl">🏷️</span>
+            <span class="text-sm">Pricing & Showcase</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- List Pricing & Before/After Repair Showcase -->
+    <div x-show="activePage === 'pricing'" x-cloak class="space-y-10">
+      
+      <!-- Section 1: Transparent List Pricing -->
+      <div class="space-y-6">
+        <div class="border-b pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-900">Standard Service & Repair Price List</h2>
+            <p class="text-xs text-slate-500">All pricing listed in South African Rand (ZAR). Part replacement costs may vary by specific hardware model.</p>
+          </div>
+          <a href="https://jay-repair-shop.onrender.com" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">
+            <span>Book Repair Online</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Mobile Devices Pricing Card -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="bg-slate-900 text-white p-4 text-center">
+                <span class="text-3xl block mb-1">📱</span>
+                <h3 class="font-bold text-lg">Smartphones & Mobile</h3>
+                <p class="text-xs text-slate-300">Android & iOS Hardware Repairs</p>
+              </div>
+              <div class="p-5 space-y-3">
+                <template x-for="(item, idx) in pricingList.phone" :key="idx">
+                  <div class="flex justify-between items-center text-xs pb-2 border-b border-slate-100 last:border-0">
+                    <div>
+                      <span class="font-bold text-slate-800 block" x-text="item.service"></span>
+                      <span class="text-[11px] text-slate-500" x-text="item.details"></span>
+                    </div>
+                    <span class="font-mono font-bold text-emerald-600 text-sm whitespace-nowrap ml-2" x-text="item.price"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-100">
+              <a href="https://jay-repair-shop.onrender.com" target="_blank" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded transition">Book Phone Service</a>
+            </div>
+          </div>
+
+          <!-- Laptops Pricing Card -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="bg-slate-900 text-white p-4 text-center">
+                <span class="text-3xl block mb-1">💻</span>
+                <h3 class="font-bold text-lg">Laptops & Notebooks</h3>
+                <p class="text-xs text-slate-300">Windows & Mac Notebook Services</p>
+              </div>
+              <div class="p-5 space-y-3">
+                <template x-for="(item, idx) in pricingList.laptop" :key="idx">
+                  <div class="flex justify-between items-center text-xs pb-2 border-b border-slate-100 last:border-0">
+                    <div>
+                      <span class="font-bold text-slate-800 block" x-text="item.service"></span>
+                      <span class="text-[11px] text-slate-500" x-text="item.details"></span>
+                    </div>
+                    <span class="font-mono font-bold text-emerald-600 text-sm whitespace-nowrap ml-2" x-text="item.price"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-100">
+              <a href="https://jay-repair-shop.onrender.com" target="_blank" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded transition">Book Laptop Service</a>
+            </div>
+          </div>
+
+          <!-- Desktop PCs Pricing Card -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="bg-slate-900 text-white p-4 text-center">
+                <span class="text-3xl block mb-1">🖥️</span>
+                <h3 class="font-bold text-lg">Desktop PCs & Workstations</h3>
+                <p class="text-xs text-slate-300">Custom Builds, Gaming PCs & Servers</p>
+              </div>
+              <div class="p-5 space-y-3">
+                <template x-for="(item, idx) in pricingList.computer" :key="idx">
+                  <div class="flex justify-between items-center text-xs pb-2 border-b border-slate-100 last:border-0">
+                    <div>
+                      <span class="font-bold text-slate-800 block" x-text="item.service"></span>
+                      <span class="text-[11px] text-slate-500" x-text="item.details"></span>
+                    </div>
+                    <span class="font-mono font-bold text-emerald-600 text-sm whitespace-nowrap ml-2" x-text="item.price"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <div class="p-4 bg-slate-50 border-t border-slate-100">
+              <a href="https://jay-repair-shop.onrender.com" target="_blank" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 rounded transition">Book PC Service</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section 2: Before & After Repair Showcase Gallery -->
+      <div class="space-y-6 pt-4 border-t border-slate-200">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Before & After Hardware Repairs</h2>
+          <p class="text-xs text-slate-500">Real repair cases completed by Jay Repair engineering staff.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <template x-for="item in showcaseItems" :key="item.id">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden space-y-3 p-5">
+              <div class="flex justify-between items-center border-b pb-2">
+                <div>
+                  <h3 class="font-bold text-slate-900 text-sm md:text-base" x-text="item.title"></h3>
+                  <span class="text-[11px] font-mono font-semibold text-blue-600" x-text="item.device"></span>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full" x-text="item.status"></span>
+              </div>
+
+              <!-- Side-by-side Before / After Visual Cards -->
+              <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1.5">
+                  <span class="text-[11px] font-bold text-red-600 flex items-center gap-1">❌ BEFORE REPAIR</span>
+                  <div class="aspect-video bg-slate-800 rounded-lg overflow-hidden relative flex items-center justify-center text-white border border-red-200">
+                    <img :src="item.beforeImg" :alt="item.title + ' Before'" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x250/ef4444/ffffff?text=Damaged+Hardware+Before';">
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug" x-text="item.beforeDesc"></p>
+                </div>
+                <div class="space-y-1.5">
+                  <span class="text-[11px] font-bold text-emerald-600 flex items-center gap-1">✅ AFTER REPAIR</span>
+                  <div class="aspect-video bg-slate-800 rounded-lg overflow-hidden relative flex items-center justify-center text-white border border-emerald-200">
+                    <img :src="item.afterImg" :alt="item.title + ' After'" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x250/10b981/ffffff?text=Restored+Hardware+After';">
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-snug" x-text="item.afterDesc"></p>
+                </div>
+              </div>
+
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1">
+                <strong class="font-bold text-slate-700 block">🛠️ Engineering Work Performed:</strong>
+                <p class="text-slate-600" x-text="item.workDone"></p>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PAGE 2: Guided Interactive Diagnostic Wizard -->
+    <div x-show="activePage === 'diagnose'" x-cloak class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200">
+      <div class="flex items-center justify-between border-b pb-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900">Device Diagnostic Wizard</h2>
+          <p class="text-xs text-slate-500">Step-by-step diagnostic decision tree</p>
+        </div>
+        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 rounded text-slate-600" x-text="'Step ' + diagStep + ' of 4'"></span>
+      </div>
+
+      <!-- Step 1: Device Selection -->
+      <div x-show="diagStep === 1" class="space-y-4">
+        <h3 class="text-base font-semibold text-slate-800">1. Select your target device hardware:</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <button @click="diagDevice = 'phone'; diagStep = 2;" class="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-center font-bold text-slate-800 flex flex-col items-center gap-2">
+            <span class="text-3xl">📱</span>
+            <span>Cell Phone / Mobile</span>
+          </button>
+          <button @click="diagDevice = 'laptop'; diagStep = 2;" class="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-center font-bold text-slate-800 flex flex-col items-center gap-2">
+            <span class="text-3xl">💻</span>
+            <span>Laptop</span>
+          </button>
+          <button @click="diagDevice = 'computer'; diagStep = 2;" class="p-6 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-center font-bold text-slate-800 flex flex-col items-center gap-2">
+            <span class="text-3xl">🖥️</span>
+            <span>Desktop PC</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Symptom Category Selection (Dynamic 8 Options per Device) -->
+      <div x-show="diagStep === 2" class="space-y-4" x-cloak>
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-semibold text-slate-800">2. Select the primary fault category:</h3>
+          <button @click="diagStep = 1;" class="text-xs text-blue-600 hover:underline font-medium">&larr; Change Device</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <template x-for="(cat, catKey) in currentCategories" :key="catKey">
+            <button @click="diagCategory = catKey; diagStep = 3;" class="p-4 border border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-left flex items-start space-x-3">
+              <span class="text-2xl" x-text="cat.icon"></span>
+              <div>
+                <div class="font-bold text-slate-900 text-sm" x-text="cat.name"></div>
+                <div class="text-xs text-slate-500 mt-0.5" x-text="cat.desc"></div>
+              </div>
+            </button>
+          </template>
+        </div>
+      </div>
+
+      <!-- Step 3: Dynamic Behavior Selection (10 Options Across Phone, Laptop, and Desktop) -->
+      <div x-show="diagStep === 3" class="space-y-4" x-cloak>
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-semibold text-slate-800">3. Select specific observed behavior across devices:</h3>
+          <button @click="diagStep = 2;" class="text-xs text-blue-600 hover:underline font-medium">&larr; Change Category</button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3">
+          <template x-for="(symptom, idx) in currentDiagnosticSymptoms" :key="idx">
+            <button @click="finishDiag(symptom)" class="w-full p-4 border border-slate-200 text-left rounded-xl hover:border-blue-500 hover:bg-blue-50/50 transition flex items-start space-x-3.5 shadow-sm">
+              <span class="text-2xl leading-none flex-shrink-0 mt-0.5" x-text="symptom.icon"></span>
+              <div class="flex-grow">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-sm font-bold text-slate-900" x-text="symptom.label"></span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-600 flex-shrink-0" x-text="symptom.repairType"></span>
+                </div>
+                <span class="text-xs text-slate-500 block mt-1" x-text="'Primary Cause: ' + symptom.title"></span>
+              </div>
+            </button>
+          </template>
+        </div>
+      </div>
+
+      <!-- Step 4: Diagnostic Assessment & Action Plan -->
+      <div x-show="diagStep === 4" class="space-y-6" x-cloak>
+        <div class="bg-blue-50/70 border border-blue-200 p-6 rounded-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-blue-200 pb-3">
+            <span class="text-xs font-bold uppercase tracking-wider bg-blue-600 text-white px-2.5 py-1 rounded" x-text="diagResult.repairType"></span>
+            <span class="text-xs font-bold text-slate-600 capitalize" x-text="'Device: ' + diagDevice"></span>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-slate-900 mb-1" x-text="diagResult.title"></h3>
+            <p class="text-xs text-slate-500 uppercase tracking-wide font-semibold" x-text="'Root Cause Domain: ' + diagResult.category"></p>
+          </div>
+          
+          <!-- Detailed Interactive Diagnostic Action Steps -->
+          <div class="bg-white p-4 rounded-lg border border-blue-100 space-y-3">
+            <strong class="text-xs font-bold text-slate-700 uppercase tracking-wider block">Recommended Diagnostic Action Plan:</strong>
+            <p class="text-sm text-slate-700 leading-relaxed font-medium" x-text="diagResult.recommendation"></p>
+            
+            <template x-if="diagResult.steps && diagResult.steps.length > 0">
+              <div class="mt-3 pt-3 border-t border-slate-100 space-y-2">
+                <span class="text-xs font-bold text-slate-600 uppercase tracking-wider block">Detailed Troubleshooting Steps:</span>
+                <ol class="list-decimal list-inside text-xs text-slate-600 space-y-1.5 pl-1">
+                  <template x-for="(st, sIdx) in diagResult.steps" :key="sIdx">
+                    <li class="leading-relaxed" x-text="st"></li>
+                  </template>
+                </ol>
+              </div>
+            </template>
+          </div>
+
+          <!-- Component & Safety Details Expansion -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-3.5 rounded-lg border border-blue-100 text-xs">
+              <strong class="font-bold text-slate-800 block mb-1">🔍 Affected Hardware IC / Component:</strong>
+              <p class="text-slate-600" x-text="diagResult.affectedComponents || 'Standard Modular / PCB Components'"></p>
+            </div>
+            <div class="bg-white p-3.5 rounded-lg border border-blue-100 text-xs">
+              <strong class="font-bold text-slate-800 block mb-1">🛡️ Safety Precaution:</strong>
+              <p class="text-slate-600" x-text="diagResult.safetyPrecaution || 'Disconnect main DC power and ESD ground before repair.'"></p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 bg-white p-4 rounded-lg border border-blue-100 text-center">
+            <div>
+              <span class="text-xs text-slate-500 block">Est. Repair Time</span>
+              <span class="font-bold text-slate-800 text-sm" x-text="diagResult.estTime"></span>
+            </div>
+            <div>
+              <span class="text-xs text-slate-500 block">Est. Repair Cost Range</span>
+              <span class="font-bold text-emerald-600 text-sm" x-text="diagResult.estCost"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <button @click="resetDiag()" class="px-4 py-2.5 border border-slate-300 rounded-lg text-xs font-semibold hover:bg-slate-100 transition text-center">
+            🔄 Restart Wizard
+          </button>
+          <button @click="printDiagnosticReport()" class="px-4 py-2.5 bg-slate-800 text-white rounded-lg text-xs font-semibold hover:bg-slate-900 transition text-center flex items-center gap-1.5">
+            <span>🖨️ Print Report</span>
+          </button>
+          <a href="https://jay-repair-shop.onrender.com" target="_blank" rel="noopener noreferrer" class="flex-grow bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-lg text-xs font-semibold transition text-center flex items-center justify-center gap-1.5 shadow-sm">
+            <span>Book Repair Service at Jay Repair Shop</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 5: Contact Page -->
+    <div x-show="activePage === 'contact'" x-cloak class="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-sm border border-slate-200">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 border-b pb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800">Contact Technical Support</h2>
+          <p class="text-slate-500 text-xs">Reach out directly to Jay Repair engineering staff.</p>
+        </div>
+        
+        <!-- Booking CTA Button for Contact Page -->
+        <a href="https://jay-repair-shop.onrender.com" target="_blank" rel="noopener noreferrer" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+          <span>Book Repair Online</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="flex flex-col items-center justify-center bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm text-center">
+          <div class="w-24 h-24 mb-3 rounded-full overflow-hidden border-2 border-blue-500 shadow-sm bg-slate-200 flex items-center justify-center">
+            <img src="./founder.jpeg" alt="Lead Developer" class="w-full h-full object-cover object-top" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Lead+Dev';">
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Lead Developer</h3>
+          <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">Jay Repair Engineer</span>
+        </div>
+
+        <div class="flex flex-col items-center justify-center bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm text-center">
+          <div class="w-24 h-24 mb-3 rounded-full overflow-hidden border-2 border-blue-500 shadow-sm bg-white flex items-center justify-center p-2">
+            <img src="./logo.png" alt="Company Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Jay+Repair';">
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Company Brand</h3>
+          <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">Jay Repair Services</span>
+        </div>
+
+        <div class="flex flex-col items-center justify-center bg-slate-50 p-6 rounded-xl border border-slate-200 shadow-sm text-center">
+          <div class="w-24 h-24 mb-3 rounded-full overflow-hidden border-2 border-blue-500 shadow-sm bg-slate-200 flex items-center justify-center">
+            <img src="./team.jpeg" alt="Company Team" class="w-full h-full object-cover object-center" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=Support+Team';">
+          </div>
+          <h3 class="text-sm font-bold text-slate-900 mb-1">Company Team</h3>
+          <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">Support Specialists</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 border-b pb-2">Direct Communication Channels & Quick Query</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="flex flex-col space-y-3 text-sm">
+            <div class="flex items-center space-x-3 text-slate-700">
+              <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              <a href="mailto:jayrepair2026@gmail.com" class="hover:underline font-medium text-blue-600 text-xs md:text-sm">jayrepair2026@gmail.com</a>
+            </div>
+            <div class="flex items-center space-x-3 text-slate-700">
+              <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 002 2h1.5a1 1 0 00.95-.69l1.2-3.6a1 1 0 00-.24-1.07l-1.8-1.8a16 16 0 007.8 7.8l1.8-1.8a1 1 0 011.07-.24l3.6 1.2a1 1 0 01.69.95V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+              <a href="tel:0626218943" class="hover:underline font-medium text-xs md:text-sm">0626218943</a>
+            </div>
+            <div class="flex items-center space-x-3 text-slate-700">
+              <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              <a href="https://www.facebook.com/share/1BYppYCtD9/" target="_blank" rel="noopener noreferrer" class="hover:underline font-medium text-blue-600 text-xs md:text-sm">Facebook Official Page</a>
+            </div>
+          </div>
+
+          <!-- Interactive Mailto Query Generator -->
+          <form @submit.prevent="sendDirectSupportMail()" class="space-y-3">
+            <div>
+              <label class="text-[11px] font-bold text-slate-700 block mb-1">Device Model & Issue</label>
+              <input type="text" x-model="contactForm.device" placeholder="e.g. Dell XPS 13 - No Power LED" required class="w-full text-xs p-2 rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-700 block mb-1">Issue Details</label>
+              <textarea x-model="contactForm.message" rows="2" placeholder="Describe symptoms or fault observations..." required class="w-full text-xs p-2 rounded border border-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs py-2 rounded font-semibold transition">
+              ✉️ Open Direct Email Ticket
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Printable Diagnostic Report Template -->
+  <div id="printReport" class="hidden print:block p-8 bg-white text-slate-900 font-sans">
+    <h1 class="text-2xl font-bold border-b pb-2 mb-4">Jay Repair Diagnostic Inspection Sheet</h1>
+    <p class="text-sm mb-1"><strong>Inspection Date:</strong> <span x-text="new Date().toLocaleDateString()"></span></p>
+    <p class="text-sm mb-1"><strong>Target Device:</strong> <span class="capitalize" x-text="diagDevice"></span></p>
+    <p class="text-sm mb-1"><strong>Diagnosed Assessment:</strong> <span x-text="diagResult.title"></span></p>
+    <p class="text-sm mb-1"><strong>Root Cause Category:</strong> <span x-text="diagResult.category"></span></p>
+    <p class="text-sm mb-1"><strong>Recommended Action Plan:</strong> <span x-text="diagResult.recommendation"></span></p>
+    <p class="text-sm mb-1"><strong>Estimated Repair Time:</strong> <span x-text="diagResult.estTime"></span></p>
+    <p class="text-sm mb-1"><strong>Estimated Repair Cost:</strong> <span x-text="diagResult.estCost"></span></p>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-center text-xs md:text-sm">
+      <p>&copy; 2026 Jay Repair Information Center. Technical diagnostic resource.</p>
+      <p>Ready to submit a service ticket? <a href="https://jay-repair-shop.onrender.com" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">Book a Repair Here &rarr;</a></p>
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+
+    // Supabase Client Setup
+    const SUPABASE_URL = 'https://ynqvufmbkxxkkuxqtxac.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucXZ1Zm1ia3h4a2t1eHF0eGFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NTkwNDcsImV4cCI6MjEwNDUzNTA0N30.nBemTyPv62iANTxmUWNRmjlM37mj6Squx0QnAnTO4TY';
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function app() {
+      return {
+        activePage: 'home',
+
+        // Diagnostic Wizard State
+        diagStep: 1,
+        diagDevice: 'phone',
+        diagCategory: 'power',
+        diagResult: { title: '', category: '', repairType: '', recommendation: '', estTime: '', estCost: '', steps: [], affectedComponents: '', safetyPrecaution: '' },
+
+        // Category Metadata (8 Categories per Device Type)
+        categoryMetadata: {
+          phone: {
+            power: { icon: '⚡', name: 'Power & Charging', desc: 'No boot, battery drain, port issues, shut offs.' },
+            display: { icon: '📱', name: 'Screen & Touch', desc: 'Black screen, cracked glass, touch dead zones.' },
+            liquid: { icon: '💧', name: 'Liquid Exposure', desc: 'Water immersion, fluid spills, board oxidation.' },
+            performance: { icon: '🔥', name: 'Thermal & System', desc: 'Overheating, app freezes, slow response.' },
+            audio: { icon: '🔊', name: 'Audio & Microphones', desc: 'No sound, muffled speaker, mic fail on calls.' },
+            network: { icon: '📡', name: 'Cellular & Connectivity', desc: 'No SIM, Wi-Fi dropouts, Bluetooth pairing fail.' },
+            camera: { icon: '📷', name: 'Camera & Flash', desc: 'Black camera preview, focus fail, flash dead.' },
+            buttons: { icon: '🔘', name: 'Buttons & Biometrics', desc: 'Unresponsive volume/power, fingerprint/Face ID.' }
+          },
+          laptop: {
+            power: { icon: '⚡', name: 'Power & Charging', desc: 'No boot LED, AC charger dropouts, DC jack damage.' },
+            display: { icon: '🖥️', name: 'Screen & Backlight', desc: 'Faint image, cracked panel, line artifacts, hinges.' },
+            liquid: { icon: '💧', name: 'Liquid Exposure', desc: 'Keyboard spills, motherboard liquid ingress.' },
+            performance: { icon: '🔥', name: 'Thermal & Fans', desc: 'Fan noise, thermal throttling, sudden shutdown.' },
+            keyboard: { icon: '⌨️', name: 'Keyboard & Touchpad', desc: 'Stuck keys, erratic trackpad pointer, backlight out.' },
+            storage: { icon: '💾', name: 'Storage & Boot Drives', desc: 'No bootable drive, blue screens, slow disk access.' },
+            connectivity: { icon: '🔌', name: 'Ports & Wireless', desc: 'USB ports unreadable, Wi-Fi dropouts, HDMI out.' },
+            audio: { icon: '🎧', name: 'Audio & Speakers', desc: 'Distorted speakers, headphone jack contact fault.' }
+          },
+          computer: {
+            power: { icon: '⚡', name: 'Power & PSU', desc: 'No power LED, trips breaker, PSU fan dead.' },
+            display: { icon: '🖥️', name: 'Graphics & Video', desc: 'No signal, 3D artifacts, GPU crash under load.' },
+            liquid: { icon: '💧', name: 'Liquid & Coolant', desc: 'AIO water cooler leaks, liquid spill damage.' },
+            performance: { icon: '🔥', name: 'Thermal & Cooling', desc: 'High CPU temps, fan noise, pump failure.' },
+            memory: { icon: '🧠', name: 'RAM & POST Boot', desc: 'Beep codes, loop on boot, blue screen crashes.' },
+            storage: { icon: '💽', name: 'Storage & RAID Drives', desc: 'SSD/HDD undetectable, smart errors, slow boot.' },
+            ports: { icon: '🔌', name: 'Front Panel & I/O', desc: 'Front USB silent, power button soft fail, audio jack.' },
+            motherboard: { icon: '🧱', name: 'Motherboard & Expansion', desc: 'PCIe card non-detected, BIOS CMOS reset issues.' }
+          }
+        },
+
+        // Pricing List Database
+        pricingList: {
+          phone: [
+            { service: 'Screen & Digitizer Replacement', details: 'Full OEM Glass + Touch Panel Assembly', price: 'R450 - R1,200' },
+            { service: 'Battery Pack Replacement', details: 'High-Capacity Lithium Battery Unit', price: 'R300 - R600' },
+            { service: 'USB-C / Lightning Port Repair', details: 'Charging Port Board & Soldering', price: 'R250 - R450' },
+            { service: 'Liquid Exposure Ultrasonic Cleaning', details: 'Full Board Bath & Corrosion Treatment', price: 'R350 - R650' },
+            { service: 'Microsoldering Power IC (PMIC)', details: 'Board-Level Component Replacement', price: 'R600 - R1,100' }
+          ],
+          laptop: [
+            { service: 'Thermal Maintenance & Dust Clean', details: 'Fresh High-Viscosity Thermal Paste', price: 'R250 - R400' },
+            { service: 'LCD Screen Panel Replacement', details: '1080p / 4K Matte & Glossy Panels', price: 'R850 - R1,800' },
+            { service: 'DC Power Jack Repair', details: 'Soldered Port or Cable Harness Replacement', price: 'R350 - R600' },
+            { service: 'Internal Battery Replacement', details: 'OEM Grade Internal Pack', price: 'R550 - R1,200' },
+            { service: 'Motherboard Component Repair', details: 'Short Circuit MOSFET & Fuse Repair', price: 'R750 - R1,600' }
+          ],
+          computer: [
+            { service: 'Full System Hardware Diagnostic', details: 'Power, RAM, Thermal & GPU Testing', price: 'R200 - R300' },
+            { service: 'Power Supply (PSU) Replacement', details: 'Installation & Clean Cable Management', price: 'R300 - R500' },
+            { service: 'CPU Cooler / AIO Installation', details: 'Mounting & Thermal Interface Application', price: 'R250 - R450' },
+            { service: 'Custom PC Assembly & Cable Cleanup', details: 'Complete PC Build from Individual Parts', price: 'R500 - R850' },
+            { service: 'GPU VRAM Thermal Pad Renewal', details: 'Full Dismount & Premium Pad Fitting', price: 'R400 - R700' }
+          ]
+        },
+
+        // Before and After Repair Showcase Database
+        showcaseItems: [
+          {
+            id: 's1',
+            title: 'Shattered OLED Screen & Frame Restoration',
+            device: 'Smartphone Assembly',
+            status: 'Completed',
+            beforeImg: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=400&q=80',
+            afterImg: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80',
+            beforeDesc: 'Severely cracked glass digitizer with black OLED ink bleed and non-responsive touch.',
+            afterDesc: 'Brand-new OEM OLED panel installed with full touch calibration and 100% responsiveness.',
+            workDone: 'Replaced full display frame assembly, transferred proximity sensor and ear speaker flex.'
+          },
+          {
+            id: 's2',
+            title: 'Thermal Throttling & Dust Clogged Radiator',
+            device: 'Gaming Laptop',
+            status: 'Completed',
+            beforeImg: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=400&q=80',
+            afterImg: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=400&q=80',
+            beforeDesc: 'CPU reaching 98°C thermal limit with heavy fan noise and dried, crusty thermal paste.',
+            afterDesc: 'CPU peak temperature dropped to 68°C under full synthetic benchmark load.',
+            workDone: 'Deep cleaned fan blades, cleared heatsink exhaust lint carpet, applied Arctic MX-4 thermal paste.'
+          },
+          {
+            id: 's3',
+            title: 'Liquid Corroded Motherboard Power Rail',
+            device: 'Laptop Mainboard',
+            status: 'Completed',
+            beforeImg: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=400&q=80',
+            afterImg: 'https://images.unsplash.com/photo-1555680202-c86f0e12f086?auto=format&fit=crop&w=400&q=80',
+            beforeDesc: 'Green copper oxide corrosion shorts on VBUS input capacitor bank causing zero power response.',
+            afterDesc: 'Main power rail restored to nominal 19V operation with steady standby power.',
+            workDone: 'Ultrasonic isopropyl alcohol cleaning bath, replaced shorted 0805 SMD capacitors, rebuilt damaged copper trace.'
+          },
+          {
+            id: 's4',
+            title: 'Custom Cable Management & Dust Cleanout',
+            device: 'Desktop Tower PC',
+            status: 'Completed',
+            beforeImg: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=400&q=80',
+            afterImg: 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=400&q=80',
+            beforeDesc: 'Tangled cables obstructing chassis airflow causing high ambient GPU temperatures.',
+            afterDesc: 'Streamlined rear cable routing with optimal front-to-back positive airflow pressure.',
+            workDone: 'Re-routed 24-pin and PCIe cables behind chassis tray, secured harness with zip-ties, cleaned intake filters.'
+          }
+        ],
+
+        // Extended Diagnostic Decision Tree (Including 10 Choices for Cell Phones, Laptops, & PCs)
+        diagnosticTree: {
+          phone: {
+            power: [
+              { 
+                icon: '❌', 
+                label: 'Completely dead (no charge indicator, no vibration when plugged in)', 
+                title: 'No Power / Blown Charging IC / Shorted VBUS', 
+                category: 'Hardware Failure', 
+                repairType: 'Pro Repair', 
+                recommendation: 'Inspect USB port pins with digital microscope, check battery terminal voltage (nominal 3.8V DC), and test main PMIC input rails for ground shorts.',
+                steps: [
+                  'Measure USB-C VBUS pin for +5V to +9V DC power input.',
+                  'Disconnect battery and check battery voltage using multimeter DC mode.',
+                  'Perform diode mode test across motherboard battery connector terminals to identify short circuits.',
+                  'Inspect power management IC (PMIC) under thermal camera during power application.'
+                ],
+                affectedComponents: 'PMIC (Power Management IC), USB-C Controller IC, Main VBUS Fuse',
+                safetyPrecaution: 'Disconnect lithium battery prior to board-level probing to avoid electrical thermal runaways.',
+                estTime: '1 - 2 Hours', estCost: 'R450 - R950'
+              },
+              { 
+                icon: '🔄', 
+                label: 'Stuck in continuous boot loop showing vendor logo', 
+                title: 'Boot Loop / Degraded Battery / OS Flash Corruption', 
+                category: 'Battery / Firmware', 
+                repairType: 'Moderate', 
+                recommendation: 'Perform hard key sequence recovery reset. Test battery under active load using DC power bench supply to verify voltage drop stability.',
+                steps: [
+                  'Trigger recovery boot mode (Volume Up + Power Key combo).',
+                  'Connect device to DC power supply; check if current draw exceeds 1.5A during startup.',
+                  'Reflash official vendor firmware image via bootloader/fastboot interface.'
+                ],
+                affectedComponents: 'Battery BMS Circuit, NAND Flash Memory, SoC Power Regulator',
+                safetyPrecaution: 'Back up data before flashing firmware; ensure battery voltage is above 3.7V.',
+                estTime: '45 Mins', estCost: 'R300 - R550'
+              },
+              {
+                icon: '🔋',
+                label: 'Battery drops percentage rapidly or shuts off randomly at 20%-30%',
+                title: 'Chemical Battery Degradation / High Internal Resistance',
+                category: 'Battery Hardware',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Check battery cycle count and state of health in system diagnostics. Replace internal battery pack.',
+                steps: [
+                  'Connect device to diagnostic suite to read battery charge cycle count and design capacity.',
+                  'Monitor voltage under full synthetic CPU/GPU benchmark load for sudden voltage collapse.',
+                  'Replace degraded lithium-ion battery cell with high-capacity OEM equivalent.'
+                ],
+                affectedComponents: 'Lithium Polymer Battery, Fuel Gauge IC, Battery Flex Protection Board',
+                safetyPrecaution: 'Avoid bending or puncturing worn lithium battery cells during back-cover removal.',
+                estTime: '30 Mins', estCost: 'R300 - R600'
+              },
+              {
+                icon: '🔌',
+                label: 'Cable must be held at an angle to charge or loose port connection',
+                title: 'Worn/Corroded Charging Port Socket or Compressed Lint',
+                category: 'Port Connection',
+                repairType: 'DIY / Moderate',
+                recommendation: 'Clean debris from charge port using anti-static probe. Replace USB flex board if solder pads or pins are worn.',
+                steps: [
+                  'Inspect USB port socket under magnification for accumulated pocket lint or bent spring pins.',
+                  'Carefully extract debris using non-conductive plastic probe and clean contacts with ESD brush.',
+                  'If charging remains intermittent, replace the lower USB-C/Lightning daughterboard.'
+                ],
+                affectedComponents: 'USB-C/Lightning Sub-Board, Port Contact Pins, Dock Connector Flex',
+                safetyPrecaution: 'Never use metal needles or conductive pins inside active charging sockets.',
+                estTime: '30 - 45 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '⚠️',
+                label: 'Phone displays "Charging Paused: Temperature Too Low/High" warning',
+                title: 'Thermistor Sensor Circuit Failure / Battery NTC Line Open',
+                category: 'Thermal Sensing',
+                repairType: 'Pro Repair',
+                recommendation: 'Check NTC thermistor resistor divider circuit on battery flex and wireless charging coil board.',
+                steps: [
+                  'Test battery thermal sensing pin (NTC) resistance using multimeter (nominal 10kΩ at room temp).',
+                  'Inspect wireless charging/NFC thermistor contact pads on rear chassis board.',
+                  'Replace missing thermal sensing SMD resistors or damaged wireless charging flex module.'
+                ],
+                affectedComponents: 'NTC Thermistor Sensor, Charging Sub-Board, PMIC Temperature ADC',
+                safetyPrecaution: 'Do not bypass temperature sensing lines as this disables critical battery fire safety protocols.',
+                estTime: '1 Hour', estCost: 'R350 - R650'
+              },
+              {
+                icon: '⚡',
+                label: 'Device gets extremely hot while charging and charges very slowly',
+                title: 'Fast Charge Switch MOSFET Short / Overvoltage Damage',
+                category: 'Power Management',
+                repairType: 'Pro Repair',
+                recommendation: 'Test charging IC input capacitors and buck regulator inductors for thermal shorts.',
+                steps: [
+                  'Connect USB power meter to measure voltage drop and excessive current draw under fast charge mode.',
+                  'Locate localized thermal hot spot around switching charger IC using thermal imager.',
+                  'Replace shorted input protection diodes and fast charge control IC.'
+                ],
+                affectedComponents: 'OVP (Overvoltage Protection) IC, Fast Charge Controller, Inductors',
+                safetyPrecaution: 'Unplug power supply immediately if charging chip exceeds 80°C on bench setup.',
+                estTime: '1 - 1.5 Hours', estCost: 'R450 - R850'
+              },
+              {
+                icon: '📱',
+                label: 'Slow charging only from PC USB ports, non-responsive to wall adapter',
+                title: 'CC Line / USB PD Controller Handshake Failure',
+                category: 'Charging Protocol',
+                repairType: 'Pro Repair',
+                recommendation: 'Inspect CC1/CC2 configuration lines on USB-C connector and USB Power Delivery controller IC.',
+                steps: [
+                  'Measure diode mode values on USB-C CC1 and CC2 signal pins.',
+                  'Check USB Power Delivery (PD) controller IC output voltage triggers.',
+                  'Replace faulty USB PD transceiver chip or repair open CC pull-down resistors.'
+                ],
+                affectedComponents: 'USB PD Controller IC, CC1/CC2 Protection Diodes, Type-C Controller',
+                safetyPrecaution: 'Ensure ESD grounding protection when handling delicate Type-C protocol ICs.',
+                estTime: '1.5 Hours', estCost: 'R500 - R900'
+              },
+              {
+                icon: '🪫',
+                label: 'Phone turns on only when connected to wall charger, turns off instantly when unplugged',
+                title: 'Disconnected Battery MOSFET / Open Battery Fuse (BMS)',
+                category: 'Battery Board Circuit',
+                repairType: 'Moderate',
+                recommendation: 'Check battery terminal solder joints and mainboard battery connector latch.',
+                steps: [
+                  'Inspect mainboard battery socket for cracked solder joints or missing terminal clips.',
+                  'Verify voltage across output pads of battery BMS flex circuit board.',
+                  'Replace battery unit or resolder mainboard battery connector terminal.'
+                ],
+                affectedComponents: 'Battery Terminal Socket, BMS Protection MOSFET, VBAT Rail',
+                safetyPrecaution: 'Use plastic spudgers when disconnecting battery latches to prevent sparking.',
+                estTime: '45 Mins', estCost: 'R300 - R550'
+              },
+              {
+                icon: '🔔',
+                label: 'Ringtone/vibration works on incoming call, but display stays pitch black',
+                title: 'Backlight Driver Circuit / Display Power IC Failure',
+                category: 'Display Power Rail',
+                repairType: 'Pro Repair',
+                recommendation: 'Check display power IC output rails (+5V / -5V) and backlight boost inductor voltage.',
+                steps: [
+                  'Measure display power management IC (Display PMIC) output terminals for required voltages.',
+                  'Perform diode test on backlight circuit anode and cathode lines.',
+                  'Replace blown backlight diode or shorted display rail decoupling capacitors.'
+                ],
+                affectedComponents: 'Display PMIC, Backlight Boost Converter, Filters & Inductors',
+                safetyPrecaution: 'Disconnect power completely before probing high-voltage backlight output pins.',
+                estTime: '1.5 Hours', estCost: 'R550 - R950'
+              },
+              {
+                icon: '🐢',
+                label: 'Phone takes over 6 hours to reach full charge (Trickle Charge Only)',
+                title: 'Damaged D+/D- Data Pins / Broken Fast Charge Data Lines',
+                category: 'Data & Charge Communication',
+                repairType: 'Moderate / Pro Repair',
+                recommendation: 'Check USB Data Positive (D+) and Data Negative (D-) continuity between port and processor.',
+                steps: [
+                  'Measure continuity on D+ and D- lines from USB socket to EMI filter array.',
+                  'Replace broken USB ESD protection array filters near dock connector.',
+                  'Replace charging daughterboard if data line trace tracks are fractured.'
+                ],
+                affectedComponents: 'USB D+/D- Lines, EMI Choke Filters, ESD Protection Array',
+                safetyPrecaution: 'Verify charging adapter current caps before diagnosing mainboard data paths.',
+                estTime: '1 Hour', estCost: 'R350 - R650'
+              }
+            ],
+            display: [
+              { 
+                icon: '💡', 
+                label: 'Vibrations/sounds active, but screen stays black', 
+                title: 'OLED / LCD Panel Micro-fracture / Backlight Rail Defect', 
+                category: 'Hardware Defect', 
+                repairType: 'Pro Repair', 
+                recommendation: 'Reseat display flex ribbon. Test screen backlight power inductor and LCD bias IC (+5V / -5V rails).',
+                steps: [
+                  'Inspect flex connector pins for bent contacts or liquid corrosion.',
+                  'Measure LCD bias voltage rail outputs (+5V / -5V) near display driver IC.',
+                  'Swap display assembly with a test panel to confirm display IC vs screen fault.'
+                ],
+                affectedComponents: 'Display Assembly, Display PMIC, EDP Flex Ribbon Connector',
+                safetyPrecaution: 'Disconnect power before detaching display flex cables to prevent backlight fuse destruction.',
+                estTime: '1 Hour', estCost: 'R450 - R1,200'
+              },
+              { 
+                icon: '🖐', 
+                label: 'Display visible but touch layer has dead zones', 
+                title: 'Digitizer Touch Layer Failure / Touch IC Desoldered', 
+                category: 'Screen Assembly', 
+                repairType: 'Moderate', 
+                recommendation: 'Replace full display glass and digitizer assembly.',
+                steps: [
+                  'Inspect digitizer trace lines along panel border for flex tears.',
+                  'Replace full screen assembly and test touch calibration.'
+                ],
+                affectedComponents: 'Capacitive Digitizer Overlay, Touch Controller IC',
+                safetyPrecaution: 'Wear safety glasses when handling shattered screen glass.',
+                estTime: '45 Mins', estCost: 'R450 - R900'
+              },
+              {
+                icon: '💥',
+                label: 'Cracked outer glass, but picture underneath is clear and touch works fine',
+                title: 'Outer Glass Cover Damage (Intact OLED/LCD)',
+                category: 'Glass Repair',
+                repairType: 'Moderate',
+                recommendation: 'Replace outer glass cover via refurbishing or replace complete screen assembly.',
+                steps: [
+                  'Inspect display panel for underlying organic ink leaks or touch dead spots.',
+                  'Separate outer glass from panel using heating station and separation wire or replace screen unit.'
+                ],
+                affectedComponents: 'Front Glass Lens, OCA Glue Layer, Frame Bezel',
+                safetyPrecaution: 'Use protective tape over cracked glass to prevent flying glass splinters.',
+                estTime: '45 Mins', estCost: 'R400 - R850'
+              },
+              {
+                icon: '🟩',
+                label: 'Vertical/horizontal colored green or pink lines running down screen',
+                title: 'OLED Gate Line Driver Damage / Display Flex Bonding Fault',
+                category: 'Panel Hardware Failure',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Replace full display panel assembly.',
+                steps: [
+                  'Inspect display flex connection for pressure points or physical impacts.',
+                  'Connect new test OLED screen to confirm resolution of vertical line artifacts.',
+                  'Install new display assembly and seal water-resistant chassis gasket.'
+                ],
+                affectedComponents: 'OLED Glass Panel, COF (Chip on Film) Flex Cable',
+                safetyPrecaution: 'Handle OLED panels carefully by edges to avoid creasing delicate flex cables.',
+                estTime: '45 Mins', estCost: 'R500 - R1,200'
+              },
+              {
+                icon: '👻',
+                label: 'Flickering display or phantom screen presses (Ghost Touching)',
+                title: 'Touch IC Signal Noise / Damaged Digitizer Grounding Shield',
+                category: 'Touch Controller / Screen',
+                repairType: 'Moderate',
+                recommendation: 'Check digitizer ground connection and replace display flex or full screen assembly.',
+                steps: [
+                  'Check grounding tape and shielding around display flex connector.',
+                  'Test digitizer responsiveness in developer diagnostics mode (Pointer Location enabled).',
+                  'Replace screen assembly if ghost presses persist.'
+                ],
+                affectedComponents: 'Touch Digitizer, Shielding Foil, Touch Controller IC',
+                safetyPrecaution: 'Avoid applying excessive pressure to screen glass while testing touch response.',
+                estTime: '45 Mins', estCost: 'R450 - R850'
+              },
+              {
+                icon: '⬛',
+                label: 'Black ink-like spots or purple blobs spreading across screen',
+                title: 'OLED Substrate Ink Bleed / Organic Layer Rupture',
+                category: 'OLED Panel Rupture',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Replace screen assembly immediately before black spot covers entire screen.',
+                steps: [
+                  'Back up device data while screen remains partially readable.',
+                  'Remove damaged screen panel taking care not to puncture underlying battery.',
+                  'Install replacement display assembly.'
+                ],
+                affectedComponents: 'OLED Emissive Substrate, Polarizer Film, Glass Base',
+                safetyPrecaution: 'Ensure screen glass fragments are completely cleared from frame prior to installing new screen.',
+                estTime: '45 Mins', estCost: 'R500 - R1,250'
+              },
+              {
+                icon: '☀️',
+                label: 'Screen brightness stays extremely dim and auto-brightness sliders fail',
+                title: 'Ambient Light Sensor (ALS) / Screen Backlight Control Failure',
+                category: 'Sensor & Screen Backlight',
+                repairType: 'Moderate',
+                recommendation: 'Inspect top ambient light sensor flex assembly and screen backlight circuits.',
+                steps: [
+                  'Clean sensor cutout window on top glass speaker mesh.',
+                  'Inspect proximity/light sensor flex cable for damage or tear.',
+                  'Replace ambient light sensor sub-flex ribbon or calibrate sensor in OS.'
+                ],
+                affectedComponents: 'Ambient Light Sensor, Sensor Flex Cable, Display Driver IC',
+                safetyPrecaution: 'Handle top ear-piece sensor flex gently as micro-soldered components are fragile.',
+                estTime: '45 Mins', estCost: 'R300 - R550'
+              },
+              {
+                icon: '📱',
+                label: 'Screen lifts off phone frame or pops out around edges',
+                title: 'Swollen Lithium Battery / Degraded Frame Adhesive Gasket',
+                category: 'Structural Hazard',
+                repairType: 'Easy / Moderate',
+                recommendation: 'IMMEDIATELY replace swollen battery and clean old frame adhesive.',
+                steps: [
+                  'Inspect for battery expansion pressure pushing behind OLED display.',
+                  'Safely remove swollen battery without using sharp tools.',
+                  'Apply fresh perimeter frame adhesive and install new battery.'
+                ],
+                affectedComponents: 'Lithium Battery Unit, Frame Bezel Adhesive, Screen Seal',
+                safetyPrecaution: 'SWOLLEN BATTERY HAZARD: Handle with extreme care in fire-safe area.',
+                estTime: '45 Mins', estCost: 'R350 - R700'
+              },
+              {
+                icon: '🌈',
+                label: 'Screen displays rainbow static / corrupted noise patterns',
+                title: 'Display MIPI DSI Data Line Signal Corruption',
+                category: 'Display Data Bus',
+                repairType: 'Pro Repair',
+                recommendation: 'Inspect MIPI EMI filters near display mainboard socket.',
+                steps: [
+                  'Measure continuity across MIPI signal filter choke arrays on mainboard.',
+                  'Replace crushed or corroded MIPI data line filters.',
+                  'Reseat or replace display connector flex cable.'
+                ],
+                affectedComponents: 'MIPI DSI Choke Filters, Mainboard FPC Connector, Display Flex',
+                safetyPrecaution: 'Ground ESD wrist strap to prevent static discharge to high-speed data lines.',
+                estTime: '1 Hour', estCost: 'R450 - R800'
+              },
+              {
+                icon: '🔄',
+                label: 'Screen orientation fails to rotate automatically when phone is turned',
+                title: 'Accelerometer / Gyroscope Sensor IC Communication Fault',
+                category: 'Motion Sensors',
+                repairType: 'Moderate / Pro Repair',
+                recommendation: 'Calibrate motion sensors in test menu (*#0*#) or replace sensor IC.',
+                steps: [
+                  'Run hardware diagnostic sensor test for Accelerometer X/Y/Z axis values.',
+                  'Inspect sensor IC power supply rail (1.8V DC).',
+                  'Reflow or replace 6-axis IMU sensor chip on mainboard.'
+                ],
+                affectedComponents: '6-Axis IMU (Accelerometer/Gyroscope IC), I2C Sensor Bus',
+                safetyPrecaution: 'Apply exact hot-air thermal profile to avoid damaging adjacent board components.',
+                estTime: '1 Hour', estCost: 'R350 - R650'
+              }
+            ],
+            liquid: [
+              { 
+                icon: '⚠️', 
+                label: 'Device exposed to liquid within the last 48 hours', 
+                title: 'Liquid Exposure & Mainboard Corrosion', 
+                category: 'Emergency Risk', 
+                repairType: 'Pro Repair', 
+                recommendation: 'IMMEDIATELY DISCONNECT BATTERY. Do not charge. Perform ultrasonic cleaning with 99% anhydrous isopropyl alcohol.',
+                steps: [
+                  'Isolate motherboard and strip all thermal pads and EMI shields.',
+                  'Immerse motherboard in 99% Isopropyl Alcohol inside an ultrasonic bath for 10 minutes.',
+                  'Bake board in PCB drying oven at 65°C for 45 minutes.',
+                  'Inspect SMD capacitors around PMIC for green copper oxide corrosion.'
+                ],
+                affectedComponents: 'Main PCB SMD Capacitors, PMIC, Battery Connector, Charge Port',
+                safetyPrecaution: 'Never apply charging voltage to a wet device. Water + Electricity = Immediate Board Destruction.',
+                estTime: '2 Hours', estCost: 'R350 - R650'
+              },
+              {
+                icon: '🔇',
+                label: 'Phone stuck in "Headphone Mode" after water spill',
+                title: 'Corroded Audio Jack Sensor / USB Audio Dock Short',
+                category: 'Liquid Sensor Circuit',
+                repairType: 'Moderate',
+                recommendation: 'Clean charging port/audio jack flex with isopropyl alcohol or replace dock flex.',
+                steps: [
+                  'Inspect 3.5mm jack or USB-C port contacts for liquid oxidation buildup.',
+                  'Clean socket with anhydrous alcohol and ESD micro brush.',
+                  'Replace dock flex cable if internal sense switch remains shorted.'
+                ],
+                affectedComponents: 'Headphone Sense Line, USB Audio Circuitry, Dock Flex',
+                safetyPrecaution: 'Ensure power is disconnected before cleaning contacts with alcohol.',
+                estTime: '30 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '📷',
+                label: 'Camera lens foggy or water droplets visible inside camera glass',
+                title: 'Liquid Moisture Trapped in Camera Housing / Lens Mold',
+                category: 'Camera Moisture',
+                repairType: 'Moderate',
+                recommendation: 'Disassemble phone, dry camera module, and replace lens adhesive seal.',
+                steps: [
+                  'Remove rear back cover and detach camera module.',
+                  'Dry housing thoroughly using warm dry air bench oven.',
+                  'Clean optical lens with optical cleaning swab and replace waterproof lens gasket.'
+                ],
+                affectedComponents: 'Camera Module Lens, Rear Glass Camera Bezel, Gaskets',
+                safetyPrecaution: 'Do not touch delicate camera sensor glass directly with bare hands.',
+                estTime: '45 Mins', estCost: 'R300 - R500'
+              },
+              {
+                icon: '💧',
+                label: 'Phone dropped in salt water or dirty soapy water',
+                title: 'Severe Electrolyte Chemical Corrosion Hazard',
+                category: 'Corrosion Emergency',
+                repairType: 'Pro Repair',
+                recommendation: 'Flush immediately with pure distilled water, then wash thoroughly in 99% isopropyl alcohol.',
+                steps: [
+                  'Disassemble phone components completely within 24 hours of dunk.',
+                  'Flush saline minerals off board using distilled water bath.',
+                  'Perform deep ultrasonic bath using anhydrous isopropyl alcohol and dry in oven.'
+                ],
+                affectedComponents: 'Entire Board PCB, Connectors, EMI Shields, Power Inductors',
+                safetyPrecaution: 'Salt water causes rapid galvanic corrosion—act immediately.',
+                estTime: '2 Hours', estCost: 'R450 - R850'
+              },
+              {
+                icon: '🔊',
+                label: 'Speaker sound is muffled, crackling, or quiet after water exposure',
+                title: 'Fluid Trapped in Speaker Membrane Transducer',
+                category: 'Acoustic Fluid Blockage',
+                repairType: 'DIY / Moderate',
+                recommendation: 'Eject water using sonic frequency tone or replace speaker module if membrane is damaged.',
+                steps: [
+                  'Run speaker water-ejection tone frequency cycle (165Hz).',
+                  'Gently absorb surface moisture from speaker grill mesh.',
+                  'Replace lower speaker box module if crackling sound persists.'
+                ],
+                affectedComponents: 'Speaker Transducer Module, Waterproof Acoustic Mesh',
+                safetyPrecaution: 'Do not push compressed high-pressure air into speaker mesh.',
+                estTime: '30 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '⚡',
+                label: 'Liquid detection alert pop-up won\'t clear after phone dried for days',
+                title: 'Corroded Moisture Sensing Resistor / Damaged Port Sensor',
+                category: 'Liquid Detection Sensor',
+                repairType: 'Moderate',
+                recommendation: 'Clean charging port pins thoroughly or replace charging port assembly.',
+                steps: [
+                  'Inspect charging port pins under microscope for green corrosion spots.',
+                  'Scrub pin contacts using 99% isopropyl alcohol.',
+                  'Replace lower charging port daughterboard to clear faulty moisture sensor trigger.'
+                ],
+                affectedComponents: 'Charge Port Moisture Sensor, USB Flex, PMIC Detection Pin',
+                safetyPrecaution: 'Do not use thermal heat guns directly on plastic USB-C sockets.',
+                estTime: '45 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '🔥',
+                label: 'Phone feels hot and drains battery fast right after liquid splash',
+                title: 'Active Component Short Circuit on VDD_MAIN Voltage Rail',
+                category: 'Short Circuit Hazard',
+                repairType: 'Pro Repair',
+                recommendation: 'Disconnect battery instantly and locate shorted capacitor on main power rail.',
+                steps: [
+                  'Disconnect battery and test VDD_MAIN rail for short to ground using multimeter.',
+                  'Apply rosin smoke or thermal camera to find heating component.',
+                  'Remove shorted SMD decoupling capacitor and replace with matching value component.'
+                ],
+                affectedComponents: 'SMD Capacitors, Main Power Rail, Filtering Diodes',
+                safetyPrecaution: 'Never leave battery plugged into mainboard with an active short circuit.',
+                estTime: '1.5 Hours', estCost: 'R500 - R900'
+              },
+              {
+                icon: '📱',
+                label: 'Screen backlight flickers or dim spots appear after liquid spill',
+                title: 'Corroded Screen Flex Pin / Blown Anode Backlight Filter',
+                category: 'Display Power Corrosion',
+                repairType: 'Pro Repair',
+                recommendation: 'Inspect display FPC socket for burnt connector pins and replace backlight filter.',
+                steps: [
+                  'Inspect FPC screen socket on mainboard for black burnt solder pins.',
+                  'Clean FPC connector using glass fiber brush and isopropyl alcohol.',
+                  'Replace corroded display filter components or resolder damaged socket pins.'
+                ],
+                affectedComponents: 'FPC Connector, Display Anode Filters, Backlight IC',
+                safetyPrecaution: 'Ensure display cable is unattached before cleaning socket with solvents.',
+                estTime: '1 Hour', estCost: 'R400 - R750'
+              },
+              {
+                icon: '🎙️',
+                label: 'Microphone stopped working after phone fell in water',
+                title: 'Liquid Clogged MEMS Microphone Acoustic Port',
+                category: 'Microphone Hardware',
+                repairType: 'Moderate / Pro Repair',
+                recommendation: 'Replace primary MEMS microphone module flex assembly.',
+                steps: [
+                  'Test audio recording using system voice recorder app.',
+                  'Inspect microphone hole port for liquid/dirt obstruction.',
+                  'Replace dock flex ribbon housing the MEMS microphone.'
+                ],
+                affectedComponents: 'Digital MEMS Microphone, Acoustic Gasket, Dock Flex',
+                safetyPrecaution: 'Do not direct liquid alcohol into active MEMS microphone ports.',
+                estTime: '45 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '🔴',
+                label: 'Liquid Contact Indicator (LCI) sticker turned solid red/pink',
+                title: 'Confirmed Liquid Ingress / Insurance Diagnostic Flag',
+                category: 'Diagnostic Flag',
+                repairType: 'Pro Repair Inspection',
+                recommendation: 'Perform complete diagnostic teardown to assess internal mainboard corrosion.',
+                steps: [
+                  'Inspect mainboard LCI stickers in SIM tray slot and internal housing.',
+                  'Remove EMI shields to check internal components for hidden oxidation.',
+                  'Provide detailed corrosion diagnostic inspection report.'
+                ],
+                affectedComponents: 'Liquid Contact Indicators, Internal Mainboard PCB',
+                safetyPrecaution: 'Document all corroded areas with photos prior to cleaning.',
+                estTime: '45 Mins', estCost: 'R200 - R400'
+              }
+            ],
+            performance: [
+              { 
+                icon: '🔥', 
+                label: 'Device overheats rapidly and battery drains in under 2 hours', 
+                title: 'Thermal Throttling / Mainboard Power Capacitor Short', 
+                category: 'Power IC Fault', 
+                repairType: 'Pro Repair', 
+                recommendation: 'Scan mainboard with thermal camera to locate hot spots (shorted decoupling capacitors on VDD main rail).',
+                steps: [
+                  'Inject 1.0V DC at 2A onto main power rail using DC bench supply.',
+                  'Locate glowing hot component under thermal imaging camera.',
+                  'Remove shorted SMD capacitor using hot air soldering workstation (350°C).'
+                ],
+                affectedComponents: 'SMD Decoupling Capacitors, High-Side Power MOSFETs, SoC Thermal Interface',
+                safetyPrecaution: 'Limit injection current to avoid burning internal motherboard copper PCB layers.',
+                estTime: '1.5 Hours', estCost: 'R500 - R850'
+              },
+              {
+                icon: '🐢',
+                label: 'Apps take long time to open, keyboard lags, interface stutters',
+                title: 'Storage Flash Memory Wear / Corrupted System Cache',
+                category: 'Software & Storage Performance',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Clear system partition cache, free up storage memory, or reset factory software.',
+                steps: [
+                  'Check internal storage capacity (ensure > 15% free disk space).',
+                  'Boot phone into recovery mode and perform "Wipe Cache Partition".',
+                  'Reflash operating system using official vendor flash tools if storage performance is degraded.'
+                ],
+                affectedComponents: 'NAND Flash Memory IC, RAM Chip, System Cache',
+                safetyPrecaution: 'Perform full cloud or PC data backup prior to wiping cache or factory resetting.',
+                estTime: '30 - 45 Mins', estCost: 'R200 - R400'
+              },
+              {
+                icon: '❄️',
+                label: 'Phone randomly freezes or restarts while playing games or using GPS',
+                title: 'CPU/RAM Solder Joint Micro-Fracture / SoC Thermal Overheating',
+                category: 'SoC Hardware Fault',
+                repairType: 'Pro Repair',
+                recommendation: 'Inspect thermal gel application over CPU and test RAM chip stability.',
+                steps: [
+                  'Inspect internal thermal graphite pads and CPU thermal paste condition.',
+                  'Run hardware stress test to monitor real-time CPU thermal throttling levels.',
+                  'Reball SoC CPU/RAM package if thermal shutdowns persist despite cooling.'
+                ],
+                affectedComponents: 'SoC (CPU/GPU), LPDDR RAM, Thermal Pad Interface',
+                safetyPrecaution: 'Use specialized CPU reballing stencils and precise heat profiles when working with layered SoC chips.',
+                estTime: '2 Hours', estCost: 'R650 - R1,200'
+              },
+              {
+                icon: '⚠️',
+                label: 'Phone displays "System UI Has Stopped" errors repeatedly',
+                title: 'Corrupted System OS Image / RAM Memory Leak',
+                category: 'Firmware Corruption',
+                repairType: 'Moderate',
+                recommendation: 'Reinstall official factory firmware without clearing user data partition if possible.',
+                steps: [
+                  'Connect phone to PC in downloading/fastboot diagnostic mode.',
+                  'Flash official system software update file using vendor flashing tool.',
+                  'Verify system UI stability and app runtime execution.'
+                ],
+                affectedComponents: 'NAND Flash OS Partition, System RAM',
+                safetyPrecaution: 'Ensure phone remains connected to stable USB port throughout firmware installation.',
+                estTime: '45 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '📶',
+                label: 'Phone gets burning hot only when mobile data / 5G is turned on',
+                title: 'RF Power Amplifier IC Overcurrent Short',
+                category: 'Cellular Transceiver Power',
+                repairType: 'Pro Repair',
+                recommendation: 'Test cellular RF Power Amplifier (PA) chip power rails for current leakage.',
+                steps: [
+                  'Enable airplane mode and check if thermal heating stops.',
+                  'Measure current draw on cellular RF power rail under thermal imager.',
+                  'Replace shorted 5G/LTE RF Power Amplifier IC module.'
+                ],
+                affectedComponents: '5G/LTE Power Amplifier IC, Transceiver, RFFE Module',
+                safetyPrecaution: 'Use proper shield removal techniques to avoid ripping surface PCB traces.',
+                estTime: '1.5 Hours', estCost: 'R550 - R950'
+              },
+              {
+                icon: '💽',
+                label: 'Phone displays "Storage Space Running Out" even when empty',
+                title: 'Corrupted File System Indexing / Storage Partition Bug',
+                category: 'File System Error',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Re-index storage partition or perform clean firmware re-flash.',
+                steps: [
+                  'Inspect system partition usage via ADB terminal or recovery menu.',
+                  'Clear orphan log files and system dump cache.',
+                  'Reflash system partition to restore clean storage allocation.'
+                ],
+                affectedComponents: 'NAND Flash Storage Controller, Partition Table',
+                safetyPrecaution: 'Back up essential personal media files before modifying storage partition tables.',
+                estTime: '30 Mins', estCost: 'R200 - R350'
+              },
+              {
+                icon: '🔋',
+                label: 'Battery health drops from 100% to 50% instantly during heavy app usage',
+                title: 'High Internal Battery Resistance (ESR Failure)',
+                category: 'Battery Performance',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Replace degraded battery pack showing high Equivalent Series Resistance (ESR).',
+                steps: [
+                  'Test battery voltage stability under 2A load using battery analyzer.',
+                  'Observe sudden voltage sag during high-current app spikes.',
+                  'Install new high-discharge capacity battery unit.'
+                ],
+                affectedComponents: 'Lithium Battery Pack, Protection Board, Power Rail Filters',
+                safetyPrecaution: 'Dispose of degraded lithium batteries at certified recycling points.',
+                estTime: '30 Mins', estCost: 'R300 - R600'
+              },
+              {
+                icon: '🔄',
+                label: 'Apps crash immediately upon launch back to home screen',
+                title: 'Android System WebView / iOS System Framework Crash',
+                category: 'Runtime Framework',
+                repairType: 'Easy',
+                recommendation: 'Update system runtime frameworks and clear app cache data.',
+                steps: [
+                  'Update Android System WebView / System Services from app store.',
+                  'Clear data/cache for affected crashing applications.',
+                  'Restart phone to clear memory stack handles.'
+                ],
+                affectedComponents: 'System Runtime Memory, App Storage Cache',
+                safetyPrecaution: 'No hardware risk involved in software runtime resetting.',
+                estTime: '20 Mins', estCost: 'R150 - R250'
+              },
+              {
+                icon: '🔒',
+                label: 'Phone stuck on activation lock / credential verification loop',
+                title: 'Security Account Lock / NVRAM Sync Failure',
+                category: 'Security Verification',
+                repairType: 'Moderate',
+                recommendation: 'Verify user credentials or reset security NVRAM parameters.',
+                steps: [
+                  'Connect device to Wi-Fi network to refresh cloud security token.',
+                  'Perform official account recovery or security partition sync.',
+                  'Verify IMEI status and user security credentials.'
+                ],
+                affectedComponents: 'Secure Enclave / TPM, NVRAM Storage Partition',
+                safetyPrecaution: 'Must provide proof of purchase/ownership for security account unlocks.',
+                estTime: '45 Mins', estCost: 'R250 - R500'
+              },
+              {
+                icon: '📱',
+                label: 'Screen touch response stutters or delays by 2-3 seconds',
+                title: 'High CPU Utilization / Digitizer Sampling Bus Lag',
+                category: 'Input Sampling Lag',
+                repairType: 'Moderate',
+                recommendation: 'Check background process CPU consumption and inspect digitizer flex connector.',
+                steps: [
+                  'Check running processes for background CPU hogging apps.',
+                  'Inspect digitizer SPI data bus connection for loose seating.',
+                  'Reseat screen flex connector or perform factory software refresh.'
+                ],
+                affectedComponents: 'Touch Digitizer Bus, CPU Scheduler, Display Ribbon',
+                safetyPrecaution: 'Disconnect battery before reseating digitizer connectors.',
+                estTime: '30 Mins', estCost: 'R200 - R400'
+              }
+            ],
+            audio: [
+              {
+                icon: '🔇',
+                label: 'No audio from ear speaker or loud speaker during media playback',
+                title: 'Audio CODEC IC / Speaker Flex Failure',
+                category: 'Audio Hardware',
+                repairType: 'Moderate',
+                recommendation: 'Inspect lower speaker module contacts for lint build-up or replace audio driver IC.',
+                steps: [
+                  'Clean speaker mesh grill with ESD brush.',
+                  'Measure impedance across speaker coil contacts (nominal 8 Ohms).',
+                  'Replace lower speaker transducer module or reflow Audio CODEC chip.'
+                ],
+                affectedComponents: 'Speaker Transducer, Audio CODEC IC, Flex Contact Pads',
+                safetyPrecaution: 'Avoid inserting sharp metal pins into speaker membrane.',
+                estTime: '45 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '🎙️',
+                label: 'Callers cannot hear your voice on regular phone calls',
+                title: 'Primary Microphone Mesh Blockage / MEMS Mic Failure',
+                category: 'Microphone Circuit',
+                repairType: 'Moderate',
+                recommendation: 'Clean bottom microphone acoustic port or replace dock flex microphone.',
+                steps: [
+                  'Clean bottom microphone hole with anti-static brush and solvent.',
+                  'Test voice recording on secondary noise-canceling microphone vs bottom mic.',
+                  'Replace primary dock flex containing bottom MEMS microphone.'
+                ],
+                affectedComponents: 'MEMS Microphone Chip, Lower Dock Flex, Mesh Seal',
+                safetyPrecaution: 'Do not poke sharp needles directly into the microphone hole.',
+                estTime: '30 - 45 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '📢',
+                label: 'Speaker output sounds distorted, buzzing, or muffled at high volume',
+                title: 'Ruptured Speaker Diaphragm Membrane / Metallic Dust Trapped',
+                category: 'Loudspeaker Damage',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Clean magnetic metal shavings from speaker coil or replace speaker transducer box.',
+                steps: [
+                  'Remove lower speaker chamber and inspect for trapped iron filings on magnet.',
+                  'Clean speaker grill enclosure mesh.',
+                  'Install new loudspeaker assembly.'
+                ],
+                affectedComponents: 'Loudspeaker Enclosure, Diaphragm, Acoustic Mesh',
+                safetyPrecaution: 'Ensure new speaker unit is firmly sealed to maintain bass chamber pressure.',
+                estTime: '30 Mins', estCost: 'R250 - R400'
+              },
+              {
+                icon: '👂',
+                label: 'Earpiece speaker volume during calls is extremely faint',
+                title: 'Clogged Earpiece Grill Mesh / Blown Earpiece Speaker',
+                category: 'Ear Speaker Assembly',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Deep clean top earpiece grill with isopropyl alcohol or replace earpiece speaker driver.',
+                steps: [
+                  'Scrub earpiece screen mesh using isopropyl alcohol and stiff ESD brush.',
+                  'Measure earpiece speaker coil resistance.',
+                  'Replace earpiece module if clean mesh does not restore volume.'
+                ],
+                affectedComponents: 'Earpiece Transducer, Front Mesh Filter, Top Speaker Flex',
+                safetyPrecaution: 'Prevent isopropyl alcohol from entering top camera/sensor lens area.',
+                estTime: '30 Mins', estCost: 'R200 - R400'
+              },
+              {
+                icon: '🎧',
+                label: 'Headphone jack audio playing in one ear only or popping',
+                title: 'Worn 3.5mm Headphone Jack Spring Contacts / Debris Ingress',
+                category: 'Audio Jack',
+                repairType: 'Moderate',
+                recommendation: 'Clean 3.5mm jack barrel interior or replace headphone jack flex sub-board.',
+                steps: [
+                  'Extract debris inside 3.5mm jack using micro probe.',
+                  'Test audio channel continuity across Tip-Ring-Ring-Sleeve (TRRS) contacts.',
+                  'Replace headphone audio jack flex assembly.'
+                ],
+                affectedComponents: '3.5mm TRRS Socket, Headphone Flex Cable, Audio Filters',
+                safetyPrecaution: 'Disconnect power before inserting metal cleaning tools into audio socket.',
+                estTime: '30 Mins', estCost: 'R250 - R400'
+              },
+              {
+                icon: '🚫',
+                label: 'Voice memo recording greyed out or call app freezes when dialing',
+                title: 'Audio CODEC Chip Pad Fracture (Loop Disease)',
+                category: 'Board-Level Audio IC',
+                repairType: 'Pro Repair',
+                recommendation: 'Micro-solder jumper wire under Audio CODEC chip master clock pads.',
+                steps: [
+                  'Remove Audio CODEC chip from motherboard using hot air station.',
+                  'Install micro jumper wires on fractured solder pads.',
+                  'Reball and resolder Audio CODEC IC onto mainboard.'
+                ],
+                affectedComponents: 'Audio CODEC IC, Mainboard Trace Jumpers, Master Clock Line',
+                safetyPrecaution: 'Requires micro-soldering skill under microscope to prevent board damage.',
+                estTime: '1.5 Hours', estCost: 'R550 - R950'
+              },
+              {
+                icon: '🎙️',
+                label: 'Speakerphone works, but video recording audio is completely silent',
+                title: 'Secondary Noise-Canceling / Camera Microphone Defect',
+                category: 'Secondary Microphone',
+                repairType: 'Moderate',
+                recommendation: 'Replace rear camera flex assembly containing secondary noise-canceling microphone.',
+                steps: [
+                  'Test audio in rear camera video recording mode vs front selfie camera.',
+                  'Inspect top/rear microphone mesh opening for dirt blockage.',
+                  'Replace top/rear camera sensor flex ribbon containing upper MEMS mic.'
+                ],
+                affectedComponents: 'Secondary MEMS Mic, Rear Camera Flex, Upper Audio Mesh',
+                safetyPrecaution: 'Do not bend flex ribbons containing delicate micro-sensors.',
+                estTime: '45 Mins', estCost: 'R300 - R500'
+              },
+              {
+                icon: '🔊',
+                label: 'Bluetooth audio connects but stutters or cuts out every few seconds',
+                title: 'Bluetooth Coaxial Antenna Disconnected / Audio Buffer Lag',
+                category: 'Wireless Audio Bus',
+                repairType: 'Moderate',
+                recommendation: 'Reseat internal Bluetooth antenna cable and clear Bluetooth cache.',
+                steps: [
+                  'Reset network & Bluetooth settings in OS menu.',
+                  'Inspect internal chassis Bluetooth/Wi-Fi coaxial antenna wire connection.',
+                  'Replace Bluetooth/Wi-Fi antenna flex module.'
+                ],
+                affectedComponents: 'Bluetooth/Wi-Fi Module, Coaxial Antenna, Shielding Box',
+                safetyPrecaution: 'Ensure antenna snap connectors are clipped securely without crushing pins.',
+                estTime: '30 - 45 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '🔔',
+                label: 'No sound or vibration on incoming notifications (Silent Mode working fine)',
+                title: 'Taptic Engine / Linear Vibration Motor Driver Defect',
+                category: 'Vibration Hardware',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Test linear haptic motor actuator and replace vibration module.',
+                steps: [
+                  'Run vibration motor diagnostic test in engineering menu.',
+                  'Inspect vibration motor contact spring pads for corrosion or alignment.',
+                  'Replace Taptic engine / linear vibration motor assembly.'
+                ],
+                affectedComponents: 'Haptic Engine Motor, Vibration Driver IC, Contact Springs',
+                safetyPrecaution: 'Tighten motor mounting screws properly to prevent chassis rattle.',
+                estTime: '30 Mins', estCost: 'R250 - R400'
+              },
+              {
+                icon: '⚠️',
+                label: 'High-pitched squealing or static feedback noise during phone calls',
+                title: 'Audio Amplifier Feedback / Grounding Shield Defect',
+                category: 'Audio Amplifier',
+                repairType: 'Pro Repair',
+                recommendation: 'Inspect audio amplifier circuit shielding ground gaskets and decoupling capacitors.',
+                steps: [
+                  'Inspect grounding clips around audio circuit shielding caps.',
+                  'Check decoupling capacitors on audio amplifier output line for leakage.',
+                  'Replace audio power amplifier IC if feedback static persists.'
+                ],
+                affectedComponents: 'Audio Amplifier IC, EMI Grounding Gaskets, Line Filters',
+                safetyPrecaution: 'Ensure grounding pads make solid contact with chassis frame.',
+                estTime: '1 Hour', estCost: 'R400 - R750'
+              }
+            ],
+            network: [
+              {
+                icon: '🚫',
+                label: 'Searching / No Service status even with active SIM card inserted',
+                title: 'Baseband Transceiver / RF Power Amplifier (PA) IC Fault',
+                category: 'Cellular Transceiver',
+                repairType: 'Pro Repair',
+                recommendation: 'Verify IMEI number via *#06#. Inspect coaxial antenna connectors on motherboard.',
+                steps: [
+                  'Check if modem firmware version loads in settings menu.',
+                  'Inspect RF coaxial cable connections along chassis perimeter.',
+                  'Reball or replace Baseband PMIC / RF Transceiver IC.'
+                ],
+                affectedComponents: 'Baseband IC, RF Power Amplifier, Coaxial Antenna Cable',
+                safetyPrecaution: 'Ensure proper ground shielding during RF component heating.',
+                estTime: '1.5 Hours', estCost: 'R600 - R1,100'
+              },
+              {
+                icon: '📡',
+                label: 'Wi-Fi toggle greyed out or cannot be switched on',
+                title: 'Wi-Fi/Bluetooth Combo Chip Desoldered / Cracked Board Trace',
+                category: 'Wi-Fi Hardware',
+                repairType: 'Pro Repair',
+                recommendation: 'Reball or replace Wi-Fi/BT module IC on motherboard.',
+                steps: [
+                  'Verify MAC address status in Wi-Fi settings menu (shows "Unavailable" if chip disconnected).',
+                  'Inspect Wi-Fi power supply rail (1.8V & 3.3V DC).',
+                  'Reflow or unbind and replace Wi-Fi IC module.'
+                ],
+                affectedComponents: 'Wi-Fi/BT Combo IC, Wi-Fi Power LDO, PCIe Data Bus',
+                safetyPrecaution: 'Wi-Fi chip replacement may require security unbinding on select smartphone models.',
+                estTime: '1.5 Hours', estCost: 'R550 - R1,050'
+              },
+              {
+                icon: '💳',
+                label: 'Phone says "No SIM Card Installed" with known good SIM card',
+                title: 'SIM Card Reader Slot Pin Damage / SIM Tray Sensor Fault',
+                category: 'SIM Interface',
+                repairType: 'Moderate / Pro Repair',
+                recommendation: 'Inspect internal SIM tray reader pins for bent contacts or replace SIM slot module.',
+                steps: [
+                  'Look inside SIM slot with magnifying glass for bent or missing spring pins.',
+                  'Test SIM detect switch pin for ground continuity when SIM tray is inserted.',
+                  'Desolder and replace SIM card reader socket or flex sub-board.'
+                ],
+                affectedComponents: 'SIM Card Reader Socket, SIM Detect Switch, ESD Diodes',
+                safetyPrecaution: 'Do not force oversize SIM adapters into reader slots.',
+                estTime: '45 Mins', estCost: 'R300 - R550'
+              },
+              {
+                icon: '📉',
+                label: 'Wi-Fi signal drops to 1 bar unless standing right next to router',
+                title: 'Wi-Fi Antenna Flex Cable / Coaxial Cable Dislodged',
+                category: 'Wireless Antenna',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Reconnect internal Wi-Fi antenna connector or replace top antenna flex wire.',
+                steps: [
+                  'Inspect internal chassis top Wi-Fi antenna connector.',
+                  'Verify continuity of coaxial antenna wire from mainboard to upper chassis frame.',
+                  'Replace dislodged or damaged Wi-Fi antenna flex ribbon.'
+                ],
+                affectedComponents: 'Wi-Fi Antenna Flex, Coaxial Antenna Cable, Chassis Ground Clips',
+                safetyPrecaution: 'Take care not to strip small coaxial press connectors.',
+                estTime: '30 Mins', estCost: 'R250 - R400'
+              },
+              {
+                icon: '📍',
+                label: 'GPS location drifts miles off or cannot lock satellite signal',
+                title: 'GPS Antenna Contact Corrosion / Sensor Flex Failure',
+                category: 'GPS Hardware',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Clean GPS antenna contact pads on top chassis frame.',
+                steps: [
+                  'Run GPS diagnostic test app to monitor active satellite signal-to-noise ratio.',
+                  'Inspect top chassis GPS antenna spring contacts for corrosion.',
+                  'Clean contacts with isopropyl alcohol or replace GPS antenna ribbon.'
+                ],
+                affectedComponents: 'GPS Antenna Module, Top Frame Contact Springs, LNA Chip',
+                safetyPrecaution: 'Ensure chassis frame screws are fully tightened to maintain spring pin pressure.',
+                estTime: '30 Mins', estCost: 'R250 - R400'
+              },
+              {
+                icon: '📶',
+                label: '5G / Mobile data speed extremely slow while voice calls work fine',
+                title: 'Damaged 5G Sub-6GHz / mmWave Antenna Module',
+                category: '5G Data Hardware',
+                repairType: 'Moderate',
+                recommendation: 'Inspect secondary 5G antenna flex modules along side frame.',
+                steps: [
+                  'Test mobile data speed using speedtest diagnostic app.',
+                  'Inspect 5G mmWave antenna flex cables for tears along housing edge.',
+                  'Replace damaged side-frame 5G antenna module.'
+                ],
+                affectedComponents: '5G mmWave Flex Module, Sub-6 Antenna, Baseband Bus',
+                safetyPrecaution: 'Disconnect battery before touching high-frequency antenna ribbons.',
+                estTime: '45 Mins', estCost: 'R350 - R650'
+              },
+              {
+                icon: '📲',
+                label: 'NFC tap-to-pay (Google Pay / Apple Pay) fails at checkout terminals',
+                title: 'NFC Coil Antenna Flex Damage / Contact Spring Disconnect',
+                category: 'NFC Circuit',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Check rear cover NFC induction coil flex connection.',
+                steps: [
+                  'Inspect NFC coil contacts on back glass or wireless charger pad.',
+                  'Test NFC card reader response with test tag.',
+                  'Replace NFC antenna coil flex assembly.'
+                ],
+                affectedComponents: 'NFC Antenna Coil, Rear Glass Flex, NFC Controller IC',
+                safetyPrecaution: 'Ensure NFC coil alignment matches rear frame pins exactly.',
+                estTime: '30 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '🔵',
+                label: 'Bluetooth pair fails constantly or drops connection to smartwatch/earbuds',
+                title: 'Bluetooth Transceiver RF Line Noise / Shared Wi-Fi Antenna Short',
+                category: 'Bluetooth Hardware',
+                repairType: 'Moderate',
+                recommendation: 'Reset Bluetooth network stack and replace shared BT/Wi-Fi antenna flex.',
+                steps: [
+                  'Clear network settings cache in OS settings.',
+                  'Check BT RF signal output level on bench spectrum analyzer.',
+                  'Replace combined Bluetooth/Wi-Fi antenna module.'
+                ],
+                affectedComponents: 'Bluetooth Module, RF Antenna, Filter Components',
+                safetyPrecaution: 'Keep ESD protection active during antenna replacements.',
+                estTime: '30 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '🌐',
+                label: 'Phone switches randomly between 4G and Edge/2G networks',
+                title: 'Cellular Band Switch IC / Antenna Switch Module Failure',
+                category: 'Cellular Band Switch',
+                repairType: 'Pro Repair',
+                recommendation: 'Inspect cellular antenna switch IC and baseband band filters.',
+                steps: [
+                  'Test manual mobile network band selection in diagnostic menu.',
+                  'Check RF antenna switch IC soldering joints on mainboard.',
+                  'Replace damaged RF antenna switch module.'
+                ],
+                affectedComponents: 'RF Antenna Switch IC, Duplexers, Baseband PMIC',
+                safetyPrecaution: 'Avoid overheating surrounding RF shielding cans.',
+                estTime: '1.5 Hours', estCost: 'R500 - R900'
+              },
+              {
+                icon: '⚠️',
+                label: 'Phone displays "Mobile Network Error: Temporary Network Lock"',
+                title: 'Corrupted NVRAM / EFS Network Security Partition',
+                category: 'Network Security NVRAM',
+                repairType: 'Moderate',
+                recommendation: 'Restore EFS/NVRAM partition from official factory security backup.',
+                steps: [
+                  'Verify baseband version and IMEI status in system settings.',
+                  'Reflash official modem partition using vendor diagnostic tool.',
+                  'Calibrate cellular network parameters.'
+                ],
+                affectedComponents: 'NAND Storage (EFS Partition), Baseband IC',
+                safetyPrecaution: 'Never erase security partition without prior binary backup.',
+                estTime: '45 Mins', estCost: 'R300 - R550'
+              }
+            ],
+            camera: [
+              {
+                icon: '📷',
+                label: 'Camera app opens to black screen or fails to focus',
+                title: 'Camera Sensor Flex Failure / Optical Image Stabilization (OIS) Short',
+                category: 'Camera Assembly',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Replace primary camera module flex assembly.',
+                steps: [
+                  'Inspect camera flex connector socket on mainboard for bent pins.',
+                  'Swap camera module with OEM test replacement unit.',
+                  'Verify camera voltage supply rails (1.8V, 2.8V DC).'
+                ],
+                affectedComponents: 'Rear Main Camera Module, Camera Power LDO, Sensor Flex Connector',
+                safetyPrecaution: 'Do not touch optical glass lens directly with bare fingers.',
+                estTime: '30 Mins', estCost: 'R350 - R750'
+              },
+              {
+                icon: '🔎',
+                label: 'Camera picture is blurry or continuously vibrates/buzzes',
+                title: 'Optical Image Stabilization (OIS) Gyro Motor Failure',
+                category: 'OIS Hardware',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Replace rear camera module with new OIS assembly.',
+                steps: [
+                  'Observe OIS lens barrel movement under camera inspection light.',
+                  'Verify if magnetic OIS coil is rattling or stuck.',
+                  'Install replacement rear camera module.'
+                ],
+                affectedComponents: 'Rear Camera OIS Coil, Gyro Sensor, Lens Barrel',
+                safetyPrecaution: 'Keep strong neodymium magnets away from camera OIS assemblies.',
+                estTime: '30 Mins', estCost: 'R400 - R800'
+              },
+              {
+                icon: '⚡',
+                label: 'LED Flashlight option is greyed out or won\'t turn on',
+                title: 'Flash LED Driver IC Short / Thermal Protection Lockout',
+                category: 'Flash Light Circuit',
+                repairType: 'Moderate',
+                recommendation: 'Inspect rear camera flash flex module and flash driver IC.',
+                steps: [
+                  'Check device temperature status (flash auto-disables during overheating).',
+                  'Test LED flash flex continuity using multimeter.',
+                  'Replace flash LED flex ribbon or resolder flash driver IC.'
+                ],
+                affectedComponents: 'Flash LED Diode, Flash Driver IC, Rear Sensor Flex',
+                safetyPrecaution: 'Do not stare directly into active high-power flash LED diodes.',
+                estTime: '30 - 45 Mins', estCost: 'R250 - R450'
+              },
+              {
+                icon: '🤳',
+                label: 'Front selfie camera fails or shows black screen while rear camera works',
+                title: 'Front Camera Sensor Flex Disconnected or Damaged',
+                category: 'Front Camera',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Reseat or replace front camera flex cable assembly.',
+                steps: [
+                  'Inspect top front camera flex FPC socket connector pins.',
+                  'Reseat front camera flex cable firmly into socket.',
+                  'Replace front camera module if black screen persists.'
+                ],
+                affectedComponents: 'Front Selfie Camera Module, Top FPC Connector',
+                safetyPrecaution: 'Take care not to damage adjacent Face ID / proximity sensors during removal.',
+                estTime: '30 Mins', estCost: 'R300 - R550'
+              },
+              {
+                icon: '🕸️',
+                label: 'Cracked rear camera lens glass causing spots/glare in photos',
+                title: 'Shattered Camera Bezel Glass Cover',
+                category: 'Lens Glass Cover',
+                repairType: 'Easy',
+                recommendation: 'Carefully pick off broken glass bezel and glue new optical lens glass.',
+                steps: [
+                  'Clean broken glass shards off camera lens surround using tweezers.',
+                  'Clean camera optical lens element gently with dry lens swab.',
+                  'Install new rear camera glass bezel with waterproof adhesive ring.'
+                ],
+                affectedComponents: 'Camera Lens Cover Glass, Adhesive Ring, Outer Bezel',
+                safetyPrecaution: 'Prevent glass splinters from entering internal camera sensor mechanism.',
+                estTime: '20 - 30 Mins', estCost: 'R200 - R350'
+              },
+              {
+                icon: '🟣',
+                label: 'Photos have persistent dark purple or black spots in every picture',
+                title: 'Dust Particle / Laser Damage on Camera Image Sensor Matrix',
+                category: 'Image Sensor Damage',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Replace primary camera module (sensor matrix cannot be cleaned internally).',
+                steps: [
+                  'Clean external glass lens cover to verify spot is internal.',
+                  'Inspect image sensor under microscope for laser burn or trapped dust.',
+                  'Replace camera module assembly.'
+                ],
+                affectedComponents: 'CMOS Image Sensor Matrix, Lens Element',
+                safetyPrecaution: 'Avoid pointing laser lights into smartphone camera lenses.',
+                estTime: '30 Mins', estCost: 'R350 - R750'
+              },
+              {
+                icon: '🔄',
+                label: 'Camera app switches between wide and ultra-wide lens erratically',
+                title: 'Multi-Camera Switch Control Signal Circuit Error',
+                category: 'Camera Controller',
+                repairType: 'Pro Repair',
+                recommendation: 'Inspect multi-camera power supply LDO chips and data lines.',
+                steps: [
+                  'Test individual camera sensors in engineering diagnostic menu.',
+                  'Measure LDO power supply outputs to multi-camera bus (1.2V, 1.8V, 2.8V).',
+                  'Replace faulty camera power management LDO chip.'
+                ],
+                affectedComponents: 'Camera Power LDO, ISP (Image Signal Processor), FPC Socket',
+                safetyPrecaution: 'Disconnect power before detaching multi-camera flex arrays.',
+                estTime: '1 Hour', estCost: 'R450 - R850'
+              },
+              {
+                icon: '🔴',
+                label: 'Camera records video fine, but audio in video has loud buzzing noise',
+                title: 'Camera OIS Interference on Internal Microphone Flex',
+                category: 'OIS / Audio Interference',
+                repairType: 'Moderate',
+                recommendation: 'Replace camera module or rear microphone flex dampening gasket.',
+                steps: [
+                  'Inspect insulating foam surrounding rear microphone flex.',
+                  'Replace rear camera module causing electromagnetic interference on mic line.',
+                  'Re-shield mic flex ribbon with EMI grounded tape.'
+                ],
+                affectedComponents: 'Rear Mic Flex, Camera EMI Shield, OIS Magnet',
+                safetyPrecaution: 'Ensure EMI shielding tape is grounded to metal frame.',
+                estTime: '45 Mins', estCost: 'R300 - R550'
+              },
+              {
+                icon: '🕶️',
+                label: 'Portrait mode / Depth blur effect fails to work',
+                title: 'ToF (Time of Flight) / Secondary Depth Sensor Failure',
+                category: 'Depth Sensor Hardware',
+                repairType: 'Moderate',
+                recommendation: 'Replace secondary depth/ToF camera sensor module.',
+                steps: [
+                  'Run depth sensor calibration test in camera diagnostics.',
+                  'Inspect IR flood illuminator / ToF sensor module flex.',
+                  'Replace depth camera sub-module.'
+                ],
+                affectedComponents: 'ToF Sensor, IR Laser Projector, Depth Flex',
+                safetyPrecaution: 'Do not stare into active IR laser flood illuminator sensor.',
+                estTime: '45 Mins', estCost: 'R350 - R650'
+              },
+              {
+                icon: '⚡',
+                label: 'Camera app causes phone to instantly shut off when opened',
+                title: 'Camera Module Short Circuit / Severe PMIC Surge',
+                category: 'Power Supply Short',
+                repairType: 'Pro Repair',
+                recommendation: 'Check camera power rail decoupling capacitors for short to ground.',
+                steps: [
+                  'Disconnect camera module and test if phone powers on normally.',
+                  'Measure resistance to ground on camera 2.8V power line.',
+                  'Replace shorted capacitor or camera module assembly.'
+                ],
+                affectedComponents: 'Camera Module, Power Rail Decoupling Caps, PMIC',
+                safetyPrecaution: 'Never leave shorted camera module connected during boot.',
+                estTime: '1 Hour', estCost: 'R400 - R750'
+              }
+            ],
+            buttons: [
+              {
+                icon: '🔘',
+                label: 'Power or volume keys stuck or unresponsive',
+                title: 'Physical Button Tactile Switch Membrane Failure',
+                category: 'Input Switches',
+                repairType: 'Moderate',
+                recommendation: 'Replace side button flex ribbon harness.',
+                steps: [
+                  'Test mechanical spring actuation of external metal button caps.',
+                  'Measure continuity across tactile dome switch when pressed.',
+                  'Replace internal button flex cable assembly.'
+                ],
+                affectedComponents: 'Side Button Flex Assembly, Tactile Micro-Switches',
+                safetyPrecaution: 'Take care not to tear thin flex ribbons during chassis removal.',
+                estTime: '45 Mins', estCost: 'R250 - R400'
+              },
+              {
+                icon: '🖐',
+                label: 'Fingerprint scanner fails to register touch or "Fingerprint Hardware Not Available"',
+                title: 'Fingerprint Sensor Flex Disconnected / Biometric IC Damage',
+                category: 'Biometric Sensor',
+                repairType: 'Moderate',
+                recommendation: 'Inspect fingerprint sensor flex connection or replace sensor module.',
+                steps: [
+                  'Inspect fingerprint sensor ribbon cable under microscope for hairline tears.',
+                  'Reseat fingerprint connector firmly on mainboard.',
+                  'Replace fingerprint module and calibrate in diagnostic suite.'
+                ],
+                affectedComponents: 'Fingerprint Sensor Module, Flex Connector, Security Enclave',
+                safetyPrecaution: 'Note: Biometric sensor replacement on certain devices may disable secure payment functions.',
+                estTime: '45 Mins', estCost: 'R300 - R600'
+              },
+              {
+                icon: '👤',
+                label: 'Face ID / Face Unlock disabled or says "Move Phone Lower/Higher"',
+                title: 'Dot Projector / TrueDepth IR Sensor Alignment / Liquid Damage',
+                category: 'Facial Biometrics',
+                repairType: 'Pro Repair',
+                recommendation: 'Inspect dot projector module glass and IR camera flex for liquid damage.',
+                steps: [
+                  'Inspect Dot Projector crystal under microscope for liquid corrosion.',
+                  'Read TrueDepth sensor code using biometric programmer tool.',
+                  'Reball or repair Dot Projector MOSFET / IC if corroded.'
+                ],
+                affectedComponents: 'Dot Projector, IR Camera, Ambient Light Sensor Flex',
+                safetyPrecaution: 'CLASS 1 LASER HAZARD: Do not powered-test Dot Projector open outside housing.',
+                estTime: '1.5 Hours', estCost: 'R600 - R1,100'
+              },
+              {
+                icon: '🔊',
+                label: 'Volume up button works but volume down button stuck down',
+                title: 'Collapsed Tactile Metal Dome Switch / Compressed Dirt',
+                category: 'Mechanical Button Switch',
+                repairType: 'Easy / Moderate',
+                recommendation: 'Clean key housing with isopropyl alcohol or replace tactile dome flex.',
+                steps: [
+                  'Remove external volume rocker cap and clean jammed dirt with alcohol.',
+                  'Test metal click dome recoil spring elasticity.',
+                  'Replace internal side button flex cable.'
+                ],
+                affectedComponents: 'Tactile Metal Dome, Volume Flex Harness, Outer Rocker Key',
+                safetyPrecaution: 'Do not use sharp metal picks to pry metal key caps from chassis.',
+                estTime: '30 Mins', estCost: 'R200 - R350'
+              },
+              {
+                icon: '🔕',
+                label: 'Silent / Mute toggle switch loose or flipping randomly',
+                title: 'Worn Mute Switch Actuator / Internal Switch Contact Wear',
+                category: 'Toggle Switch',
+                repairType: 'Moderate',
+                recommendation: 'Replace volume & mute switch flex cable assembly.',
+                steps: [
+                  'Inspect external toggle mechanical slider arm alignment.',
+                  'Test switch contact continuity in ON and OFF positions.',
+                  'Replace internal mute switch flex harness.'
+                ],
+                affectedComponents: 'Mute Toggle Switch, Mechanical Slider, Flex Wiring',
+                safetyPrecaution: 'Keep track of tiny mechanical bracket screws during disassembly.',
+                estTime: '45 Mins', estCost: 'R250 - R400'
+              },
+              {
+                icon: '🏠',
+                label: 'Home button / Touch ID double-taps repeatedly or feels hot',
+                title: 'Home Button Flex Micro-Tear / Shorted Capacitive Sensor',
+                category: 'Home Button Assembly',
+                repairType: 'Moderate / Pro Repair',
+                recommendation: 'Inspect home button flex ribbon for micro-fractures under microscope.',
+                steps: [
+                  'Inspect thin home button flex ribbon along display fold for tears.',
+                  'Measure current draw across home button power rails.',
+                  'Repair flex trace using micro-soldering wire or replace home button assembly.'
+                ],
+                affectedComponents: 'Home Button Capacitive Sensor, Flex Ribbon, Touch ID Chip',
+                safetyPrecaution: 'Handle home button flex with extreme caution as original Touch ID chip is unique to mainboard.',
+                estTime: '1 Hour', estCost: 'R350 - R700'
+              },
+              {
+                icon: '🔘',
+                label: 'Power button turns screen off, but long-press power menu fails',
+                title: 'Software Key Remapping / OS Button Signal Timeout',
+                category: 'OS Button Signal',
+                repairType: 'Easy',
+                recommendation: 'Reset side key settings in OS menu or reflash firmware.',
+                steps: [
+                  'Check "Side Key / Power Button" configuration in system settings.',
+                  'Test button signal response in factory hardware test menu.',
+                  'Reset settings or reflash system software.'
+                ],
+                affectedComponents: 'Power Key Signal Line, OS Controller',
+                safetyPrecaution: 'No physical hardware risk involved in settings reset.',
+                estTime: '15 Mins', estCost: 'R150 - R250'
+              },
+              {
+                icon: '💥',
+                label: 'External physical button cap broke off or fell out of phone frame',
+                title: 'Broken Metal Button Retaining Clip / Outer Key Cap Lost',
+                category: 'Mechanical Housing',
+                repairType: 'Easy',
+                recommendation: 'Install replacement external button cap and retaining rubber gasket.',
+                steps: [
+                  'Inspect button slot in chassis frame for metal retaining clip damage.',
+                  'Insert new external key cap with rubber sealing ring into frame.',
+                  'Test mechanical spring press against internal flex button.'
+                ],
+                affectedComponents: 'External Key Cap, Rubber Retaining Gasket, Chassis Slot',
+                safetyPrecaution: 'Ensure rubber gasket is properly seated to prevent water ingress.',
+                estTime: '20 Mins', estCost: 'R150 - R300'
+              },
+              {
+                icon: '⚡',
+                label: 'Pressing power button triggers volume down simultaneously',
+                title: 'Short Circuit Between Parallel Button Flex Signal Traces',
+                category: 'Button Flex Short',
+                repairType: 'Moderate',
+                recommendation: 'Replace entire combined power/volume flex ribbon harness.',
+                steps: [
+                  'Inspect side button flex ribbon for liquid corrosion or crushed traces.',
+                  'Measure resistance across power and volume signal pins.',
+                  'Install new replacement button flex harness.'
+                ],
+                affectedComponents: 'Power/Volume Flex Ribbon, FPC Socket',
+                safetyPrecaution: 'Disconnect battery before unplugging button flex FPC connector.',
+                estTime: '30 - 45 Mins', estCost: 'R250 - R400'
+              },
+              {
+                icon: '🔒',
+                label: 'In-display optical fingerprint scanner light flashes but fails to scan',
+                title: 'Optical Sensor Calibration Loss / Display Glass Replacement Defect',
+                category: 'Optical Biometric Calibration',
+                repairType: 'Moderate',
+                recommendation: 'Recalibrate optical fingerprint sensor using biometric optical rubber calibration tool.',
+                steps: [
+                  'Clean glass surface thoroughly over optical sensor camera cutout.',
+                  'Run optical fingerprint sensor calibration process using factory calibration tool.',
+                  'Test fingerprint registration in system settings.'
+                ],
+                affectedComponents: 'Under-Display Optical Camera Sensor, Calibration Firmware',
+                safetyPrecaution: 'Avoid scratching display glass directly above optical sensor lens.',
+                estTime: '30 Mins', estCost: 'R250 - R450'
+              }
+            ]
+          },
+          laptop: {
+            power: [
+              { 
+                icon: '🔌', 
+                label: 'Charger plugged in but DC charging LED remains dark', 
+                title: 'DC Jack / Primary Rail Input MOSFET Short', 
+                category: 'Hardware Failure', 
+                repairType: 'Pro Repair', 
+                recommendation: 'Measure DC jack center pin voltage (+19V DC nominal). Test dual input MOSFETs on main system power rail.',
+                steps: [
+                  'Measure adapter output voltage at DC barrel jack or USB-C PD controller.',
+                  'Probe drain and source pins of 1st and 2nd input MOSFETs for 19V voltage pass-through.',
+                  'Check current sense resistor for blown trace or infinite resistance.'
+                ],
+                affectedComponents: 'DC Power Jack, Dual Input Power MOSFETs, Charging IC (ISL/BQ Series)',
+                safetyPrecaution: 'Unplug AC charger before performing continuity or diode tests on main rail.',
+                estTime: '1 - 2 Hours', estCost: 'R350 - R750'
+              },
+              { 
+                icon: '🪫', 
+                label: 'Laptop shuts off instantly when AC adapter is disconnected', 
+                title: 'Battery Cell Depletion / BMS Fuse Lockout', 
+                category: 'Battery Hardware', 
+                repairType: 'DIY / Easy', 
+                recommendation: 'Internal lithium battery management system (BMS) tripped or cell voltage degraded below 2.5V/cell.',
+                steps: [
+                  'Run battery health report via OS diagnostic terminal (e.g. powercfg /batteryreport).',
+                  'Inspect internal battery casing for gas buildup swelling or leakage.',
+                  'Replace internal battery module with OEM specification battery.'
+                ],
+                affectedComponents: 'Internal Lithium Battery Pack, BMS Board, Battery Connector Pins',
+                safetyPrecaution: 'Do not puncture or bend soft-pack lithium-polymer battery cells.',
+                estTime: '30 Mins', estCost: 'R550 - R1,200'
+              }
+            ],
+            display: [
+              { 
+                icon: '📺', 
+                label: 'Faint image visible only when holding flashlight to screen', 
+                title: 'Blown Backlight Fuse / EDP Backlight Driver Failure', 
+                category: 'Board Level Defect', 
+                repairType: 'Pro Repair', 
+                recommendation: 'Inspect motherboard near EDP cable connector for blown +19V backlight circuit SMD fuse.',
+                steps: [
+                  'Check continuity across 3A/32V backlight fuse located near display connector.',
+                  'Measure VBL power voltage (+19V DC) at EDP display ribbon connector pin 38-40.',
+                  'Replace blown SMD backlight fuse using fine soldering tip.'
+                ],
+                affectedComponents: 'SMD Backlight Fuse, EDP Connector, LED Driver IC',
+                safetyPrecaution: 'ALWAYS disconnect battery before plugging/unplugging EDP screen cable to prevent shorting 19V to GPU data lines.',
+                estTime: '1.5 Hours', estCost: 'R500 - R950'
+              },
+              { 
+                icon: '⚡', 
+                label: 'Screen flickers or shows lines when adjusting lid angle', 
+                title: 'Pinched EDP Display Hinge Cable Assembly', 
+                category: 'Cable Defect', 
+                repairType: 'Moderate', 
+                recommendation: 'Flexible EDP video cable frayed inside laptop hinge mechanism. Replace EDP cable assembly.',
+                steps: [
+                  'Disassemble screen bezel and hinge covers.',
+                  'Inspect braided video cable for pinches, exposed copper wires, or shield wear.',
+                  'Reroute new replacement EDP cable through hinge channel.'
+                ],
+                affectedComponents: 'Flexible EDP Display Cable, Hinge Routing Channel',
+                safetyPrecaution: 'Ensure cable is routed smoothly inside metal hinge to avoid crushing during lid closure.',
+                estTime: '1 Hour', estCost: 'R350 - R600'
+              }
+            ],
+            liquid: [
+              { 
+                icon: '☕', 
+                label: 'Liquid spilled across laptop keyboard surface', 
+                title: 'Keyboard Membrane & Motherboard Liquid Ingress', 
+                category: 'Emergency Risk', 
+                repairType: 'Pro Repair', 
+                recommendation: 'Invert laptop immediately. Strip system down to mainboard and wash with 99% Isopropyl Alcohol.',
+                steps: [
+                  'Invert laptop body in tent position to drain liquid away from motherboard.',
+                  'Remove mainboard; remove CMOS coin cell battery and main battery pack.',
+                  'Scrub corroded solder joints with soft brush and isopropyl alcohol.'
+                ],
+                affectedComponents: 'Keyboard Membrane Switches, Motherboard Power Rails, Touchpad Board',
+                safetyPrecaution: 'Do not attempt to blow-dry with high heat, which melts keyboard keycaps and spreads liquid deeper.',
+                estTime: '2 Hours', estCost: 'R450 - R850'
+              }
+            ],
+            performance: [
+              { 
+                icon: '🌪️', 
+                label: 'Cooling fan runs at 100% speed continuously with severe lag', 
+                title: 'Thermal Throttling / Dried Thermal Paste / Dust Clogged Heatsink', 
+                category: 'Maintenance', 
+                repairType: 'DIY / Moderate', 
+                recommendation: 'Clear dust carpet from radiator exhaust fins and re-apply high performance thermal compound.',
+                steps: [
+                  'Remove heatpipe assembly from CPU and GPU dies.',
+                  'Clean hardened dried thermal compound using alcohol wipes.',
+                  'Apply pea-sized amount of high viscosity thermal paste (e.g. Arctic MX-4/5).',
+                  'Clear lint and dust carpet blocking heatsink fins.'
+                ],
+                affectedComponents: 'CPU/GPU Thermal Paste, Copper Heatpipe Heatsink, Cooling Fan Motor',
+                safetyPrecaution: 'Tighten heatsink screws in diagonal numbered sequence to ensure flat pressure across silicon die.',
+                estTime: '45 Mins', estCost: 'R250 - R400'
+              }
+            ],
+            keyboard: [
+              {
+                icon: '⌨️',
+                label: 'Multiple keys repeating or completely unresponsive',
+                title: 'Keyboard Membrane Trace Oxidation / Controller Fault',
+                category: 'Input Devices',
+                repairType: 'Moderate',
+                recommendation: 'Replace entire laptop internal keyboard assembly.',
+                steps: [
+                  'Disconnect battery and keyboard ribbon cable from mainboard ZIF socket.',
+                  'Remove plastic rivets holding keyboard plate in chassis.',
+                  'Install new replacement keyboard module and test key map.'
+                ],
+                affectedComponents: 'Keyboard Matrix Membrane, Embedded Controller (EC) IC',
+                safetyPrecaution: 'Be gentle with ZIF ribbon locking latches to prevent snapping plastic clips.',
+                estTime: '1 Hour', estCost: 'R350 - R700'
+              }
+            ],
+            storage: [
+              {
+                icon: '💾',
+                label: 'Laptop boots directly into BIOS or displays "No Boot Device Detected"',
+                title: 'NVMe / SATA SSD Failure or Boot Partition Corruption',
+                category: 'Storage System',
+                repairType: 'Moderate',
+                recommendation: 'Test SSD health in BIOS NVMe self-test menu or replace M.2 storage drive.',
+                steps: [
+                  'Reseat M.2 NVMe SSD drive in slot.',
+                  'Run hardware storage diagnostic or boot USB recovery disk.',
+                  'Replace failed M.2 SSD drive and reinstall operating system.'
+                ],
+                affectedComponents: 'M.2 NVMe SSD, SATA Controller, NAND Controller IC',
+                safetyPrecaution: 'Disconnect power before inserting or removing M.2 SSD cards.',
+                estTime: '45 Mins', estCost: 'R400 - R950'
+              }
+            ],
+            connectivity: [
+              {
+                icon: '🔌',
+                label: 'USB ports fail to recognize plugged thumb drives or devices',
+                title: 'USB Host Controller Port Damage / Blown 5V VBUS Protection Fuse',
+                category: 'I/O Ports',
+                repairType: 'Pro Repair',
+                recommendation: 'Measure +5V DC rail output across USB port power pins.',
+                steps: [
+                  'Inspect USB port physical pins for plastic connector breakage.',
+                  'Test SMD polyfuse near USB port for open circuit status.',
+                  'Replace damaged USB port connector or board sub-assembly.'
+                ],
+                affectedComponents: 'USB Type-A / Type-C Port, 5V Polyfuse, USB Hub Controller IC',
+                safetyPrecaution: 'Avoid inserting bent USB devices that short +5V to ground.',
+                estTime: '1 Hour', estCost: 'R300 - R600'
+              }
+            ],
+            audio: [
+              {
+                icon: '🎧',
+                label: 'Audio crackles or headphone jack fails to switch off main speakers',
+                title: 'Headphone Jack Sensing Pin Wear / Realtek Audio Chip Defect',
+                category: 'Audio Circuitry',
+                repairType: 'Moderate',
+                recommendation: 'Clean 3.5mm jack barrel or replace audio sub-board.',
+                steps: [
+                  'Clean jack socket using isopropyl alcohol and cotton micro-swab.',
+                  'Inspect sense switch inside 3.5mm jack socket.',
+                  'Replace daughterboard audio assembly or resolder jack pins.'
+                ],
+                affectedComponents: '3.5mm Audio Jack, Audio Amplifier IC, Sense Switch',
+                safetyPrecaution: 'Do not force oversize adapter pins into 3.5mm audio jacks.',
+                estTime: '45 Mins', estCost: 'R250 - R450'
+              }
+            ]
+          },
+          computer: {
+            power: [
+              { 
+                icon: '⚡', 
+                label: 'Power button yields no fan movement or status LED lights', 
+                title: 'Power Supply (PSU) Failure / Motherboard 5VSB Short', 
+                category: 'Power Supply', 
+                repairType: 'DIY / Moderate', 
+                recommendation: 'Test PSU +5VSB standby rail. Conduct paperclip diagnostic test on 24-pin ATX connector.',
+                steps: [
+                  'Unplug 24-pin ATX cable from motherboard.',
+                  'Insert paperclip jumper between Pin 16 (PS-ON Green) and Pin 17 (GND Black).',
+                  'If PSU fan spins, motherboard startup circuit or power button switch is faulty.'
+                ],
+                affectedComponents: 'Desktop ATX Power Supply, +5VSB Standby Rail, Front Panel Power Switch',
+                safetyPrecaution: 'Never open internal high-voltage capacitors inside ATX PSU enclosure.',
+                estTime: '45 Mins', estCost: 'R300 - R600'
+              },
+              { 
+                icon: '🔊', 
+                label: 'System turns on, fans spin, but motherboards emits beep codes', 
+                title: 'RAM POST Initialization Check Failure', 
+                category: 'System Hardware', 
+                repairType: 'DIY / Easy', 
+                recommendation: 'Decode speaker beep codes (e.g. 3 short beeps = RAM failure). Reseat RAM modules in DIMM slots.',
+                steps: [
+                  'Power down system and switch off PSU rear toggle.',
+                  'Remove RAM sticks; clean gold edge contacts using pencil eraser or alcohol.',
+                  'Re-insert single RAM module firmly into DIMM slot A2 until side clips lock.'
+                ],
+                affectedComponents: 'DDR4/DDR5 RAM Modules, Motherboard DIMM Slots, CPU Memory Controller',
+                safetyPrecaution: 'Touch metal chassis frame to discharge static electricity before touching memory modules.',
+                estTime: '30 Mins', estCost: 'R200 - R400'
+              }
+            ],
+            display: [
+              { 
+                icon: '🖥️', 
+                label: 'PC turns on with active fans, but monitor says "No Signal"', 
+                title: 'GPU PCIe Slot Contact Failure / Display Port Handshake Loss', 
+                category: 'Video Output', 
+                repairType: 'DIY / Easy', 
+                recommendation: 'Reseat discrete graphics card in PCIe x16 slot. Clear motherboard CMOS settings.',
+                steps: [
+                  'Remove GPU PCIe power connectors and safety latch; unseat graphics card.',
+                  'Clean PCIe slot with compressed air; reinsert graphics card firmly.',
+                  'Clear motherboard CMOS by removing CR2032 battery for 5 minutes.'
+                ],
+                affectedComponents: 'Graphics Card (GPU), PCIe x16 Motherboard Slot, DisplayPort Cable',
+                safetyPrecaution: 'Ensure GPU PCIe latch clicks completely into place to prevent pin arching.',
+                estTime: '30 Mins', estCost: 'R200 - R350'
+              },
+              { 
+                icon: '👾', 
+                label: 'Screen exhibits visual artifacts or 3D games crash constantly', 
+                title: 'GPU VRAM Thermal Throttling / Silicon Degradation', 
+                category: 'Graphics Card', 
+                repairType: 'Pro Repair', 
+                recommendation: 'Monitor VRAM temperatures. Replace degraded thermal pads on graphics card memory chips.',
+                steps: [
+                  'Run GPU stress test (e.g., FurMark) while checking VRAM temperature readings.',
+                  'Disassemble GPU cooler shroud; clean dried thermal paste from GPU die.',
+                  'Replace oily or degraded VRAM thermal pads with correct millimeter thickness pads.'
+                ],
+                affectedComponents: 'Graphics Card VRAM Modules, Thermal Pads, GPU Core Die',
+                safetyPrecaution: 'Use correct thermal pad thickness (0.5mm - 2.0mm) to avoid lifting cold plate off GPU core.',
+                estTime: '1.5 Hours', estCost: 'R400 - R750'
+              }
+            ],
+            liquid: [
+              { 
+                icon: '💧', 
+                label: 'AIO Liquid Cooler leaked onto internal PC components', 
+                title: 'AIO Coolant Leak Electrical Short Hazard', 
+                category: 'Emergency Risk', 
+                repairType: 'Pro Repair', 
+                recommendation: 'Shut power down instantly. Disassemble components and clean glycol residue with isopropyl alcohol.',
+                steps: [
+                  'Unplug main AC power cable.',
+                  'Dismount leaked GPU and expansion cards.',
+                  'Wipe away conductive glycol coolant with lint-free microfiber towels and 99% alcohol.'
+                ],
+                affectedComponents: 'AIO Liquid Pump/Hoses, Motherboard PCIe Slots, GPU PCB',
+                safetyPrecaution: 'Allow 24 hours of thorough drying before attempting to power system back on.',
+                estTime: '2 Hours', estCost: 'R450 - R850'
+              }
+            ],
+            performance: [
+              { 
+                icon: '🔥', 
+                label: 'CPU hits 90°C+ and PC shuts down under load', 
+                title: 'Cooler Thermal Paste Degradation / AIO Pump Failure', 
+                category: 'Cooling Hardware', 
+                repairType: 'DIY / Easy', 
+                recommendation: 'Verify CPU fan/AIO pump tachometer RPM in BIOS. Re-apply thermal compound.',
+                steps: [
+                  'Check BIOS hardware monitor to verify CPU Pump RPM > 2000 RPM.',
+                  'Ensure plastic protective film was removed from heatsink copper base.',
+                  'Re-mount CPU cooler with even diagonal screw torque.'
+                ],
+                affectedComponents: 'AIO Water Pump, CPU Cooling Fan, Thermal Paste Interface',
+                safetyPrecaution: 'Do not run system without CPU heatsink attached, even for brief diagnostic tests.',
+                estTime: '45 Mins', estCost: 'R250 - R450'
+              }
+            ],
+            memory: [
+              {
+                icon: '🧠',
+                label: 'Random Windows Blue Screen (BSOD) errors pointing to memory faults',
+                title: 'RAM Stick Timing Errors / Defective Memory Cell',
+                category: 'System Memory',
+                repairType: 'DIY / Moderate',
+                recommendation: 'Run MemTest86 diagnostic utility on individual RAM sticks.',
+                steps: [
+                  'Boot PC into MemTest86 bootable USB drive.',
+                  'Run memory test cycles to locate specific faulty RAM module.',
+                  'Replace failed RAM stick module.'
+                ],
+                affectedComponents: 'RAM Module, Memory Channel IC, Motherboard Bus',
+                safetyPrecaution: 'Disable XMP/EXPO memory profiles in BIOS before re-testing.',
+                estTime: '1 Hour', estCost: 'R200 - R300'
+              }
+            ],
+            storage: [
+              {
+                icon: '💽',
+                label: 'Hard drive making clicking noises or SSD not recognized in Windows',
+                title: 'Mechanical HDD Actuator Head Failure / SSD Controller Fault',
+                category: 'Storage Hardware',
+                repairType: 'Moderate / Data Recovery',
+                recommendation: 'Check S.M.A.R.T drive metrics or replace storage drive.',
+                steps: [
+                  'Check CrystalDiskInfo drive status metrics.',
+                  'Replace faulty SATA cable or power connector lead.',
+                  'Clone or replace drive to prevent total data loss.'
+                ],
+                affectedComponents: 'SATA Hard Drive, NVMe SSD, SATA Controller Chip',
+                safetyPrecaution: 'Immediately back up data if mechanical drive begins clicking.',
+                estTime: '1 Hour', estCost: 'R300 - R600'
+              }
+            ],
+            ports: [
+              {
+                icon: '🔌',
+                label: 'Front panel power button or USB header ports non-functional',
+                title: 'Front Panel Cable Dislodged / Internal Header Pin Short',
+                category: 'Front Chassis I/O',
+                repairType: 'DIY / Easy',
+                recommendation: 'Check front panel header wiring connections on motherboard.',
+                steps: [
+                  'Inspect motherboard front panel header pin layout.',
+                  'Ensure POWER SW, RESET SW, and USB 3.0 headers are fully seated.',
+                  'Replace front chassis I/O sub-board if header cable is severed.'
+                ],
+                affectedComponents: 'Chassis Front I/O Module, Front Panel Cables, Motherboard Headers',
+                safetyPrecaution: 'Turn off PSU rocker switch prior to plugging in motherboard headers.',
+                estTime: '30 Mins', estCost: 'R200 - R350'
+              }
+            ],
+            motherboard: [
+              {
+                icon: '🧱',
+                label: 'CMOS clock resets on reboot or PCIe slot fails to detect sound/LAN cards',
+                title: 'Blown CMOS Battery / Failed Motherboard VRM Phase',
+                category: 'Motherboard Hardware',
+                repairType: 'Moderate',
+                recommendation: 'Replace CR2032 coin cell battery or inspect VRM power MOSFETs.',
+                steps: [
+                  'Measure CR2032 CMOS battery voltage with multimeter (replace if < 2.8V).',
+                  'Inspect capacitors around CPU socket for bulging tops.',
+                  'Reflash BIOS using BIOS Flashback button interface.'
+                ],
+                affectedComponents: 'CR2032 Battery, Motherboard VRM MOSFETs, BIOS EEPROM Chip',
+                safetyPrecaution: 'Do not interrupt power while flashing BIOS firmware.',
+                estTime: '45 Mins', estCost: 'R200 - R500'
+              }
+            ]
+          }
+        },
+
+        // Direct Mail Form State
+        contactForm: { device: '', message: '' },
+
+        pageTitles: {
+          home: { title: 'Hardware Diagnostic Information Center', subtitle: 'Explore root causes, repair pricing, before & after showcases, and interactive diagnostic tools.' },
+          diagnose: { title: 'Interactive Hardware Diagnostic Wizard', subtitle: 'Pinpoint device hardware faults with guided decision trees.' },
+          pricing: { title: 'Service List Pricing & Before/After Showcase', subtitle: 'View transparent repair pricing and real-world hardware restoration cases.' },
+          contact: { title: 'Contact Support', subtitle: 'Get direct technical support for your hardware symptoms.' }
+        },
+
+        async fetchPrices() {
+          try {
+            const { data, error } = await supabaseClient
+              .from('services')
+              .select('category, service, details, price');
+
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+              const freshPricing = { phone: [], laptop: [], computer: [] };
+              data.forEach(item => {
+                if (freshPricing[item.category]) {
+                  freshPricing[item.category].push({
+                    service: item.service,
+                    details: item.details,
+                    price: item.price
+                  });
+                }
+              });
+              this.pricingList = freshPricing;
+            }
+          } catch (err) {
+            console.warn('Fallback to static pricing:', err.message);
+          }
+        },
+
+        async fetchShowcase() {
+          try {
+            const { data, error } = await supabaseClient
+              .from('showcase')
+              .select('*');
+
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+              this.showcaseItems = data;
+            }
+          } catch (err) {
+            console.warn('Fallback to static showcase:', err.message);
+          }
+        },       
+       
+        initApp() {
+          this.fetchPrices();
+          this.fetchShowcase();
+        },
+
+        setPage(page) {
+          this.activePage = page;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+
+        get currentCategories() {
+          return this.categoryMetadata[this.diagDevice] || {};
+        },
+
+        get currentDiagnosticSymptoms() {
+          return (this.diagnosticTree[this.diagDevice] && this.diagnosticTree[this.diagDevice][this.diagCategory]) || [];
+        },
+
+        finishDiag(symptom) {
+          this.diagResult = symptom;
+          this.diagStep = 4;
+        },
+
+        resetDiag() {
+          this.diagStep = 1;
+        },
+
+        printDiagnosticReport() {
+          window.print();
+        },
+
+        sendDirectSupportMail() {
+          const mailto = `mailto:jayrepair2026@gmail.com?subject=Support Request: ${encodeURIComponent(this.contactForm.device)}&body=${encodeURIComponent(this.contactForm.message)}`;
+          window.location.href = mailto;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
